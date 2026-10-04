@@ -1,0 +1,27 @@
+# Python / Byte-code
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# PyInstaller / Build outputs
+build/
+dist/
+*.spec
+
+# File di dati sensibili e configurazioni locali
+settings.json
+app.log
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.swp
+
+# Windows
+Thumbs.db
+Desktop.ini
