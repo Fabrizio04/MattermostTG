@@ -27,11 +27,11 @@ Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed e
 ```
 MattermostTG/
 ├── img/
-│   ├── icon_active.ico       # Icona per Windows (Attiva)
-│   ├── icon_inactive.ico     # Icona per Windows (Inattiva)
+    ├── icon_active.ico       # Icona per Windows (Attiva)
+    ├── icon_inactive.ico     # Icona per Windows (Inattiva)
     ├── icon_active.png       # Icona per Linux / macOS (Attiva)
     ├── icon_inactive.png     # Icona per Linux / macOS (Inattiva)
-|   └── mattermost.af         # Progetto affinity
+    └── mattermost.af         # Progetto affinity
 ├── mattermost_notifier.py    # Entry point dell'applicazione
 ├── MattermostApp.py          # Gestione System Tray e menu contestuale
 ├── SettingsDialog.py         # Interfaccia GUI per la configurazione
@@ -53,30 +53,32 @@ MattermostTG/
    ```
 
 2. **Installa le dipendenze di sistema (Solo Linux):**
-   **Ubuntu / Debian / Linux Mint:**
+
+   **Ubuntu / Debian / Linux Mint**
    ```bash
    sudo apt update
    sudo apt install -y libxcb-cursor0 libxcb-util1 libx11-xcb1 dbus
    ```
 
-3. **Crea ed attiva un ambiente virtuale (opzionale ma consigliato):**
-   **Windows:**
+4. **Crea ed attiva un ambiente virtuale (opzionale ma consigliato):**
+   
+   **Windows**
    ```bash
    python -m venv venv
    venv\Scripts\activate
    ```
-   **Linux / macOS:**
+   **Linux / macOS**
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
 
-4. **Installa le dipendenze Python:**
+5. **Installa le dipendenze Python:**
    ```bash
    pip install PyQt6 websockets requests keyring pyinstaller
    ```
 
-5. **Avvia l'applicazione:**
+6. **Avvia l'applicazione:**
    ```bash
    python mattermost_notifier.py
    ```
@@ -92,16 +94,19 @@ py -m PyInstaller --noconsole --onefile --add-data "img;img" --icon="img/icon_ac
 ```
 
 ### 🐧 Linux (Binary ELF)
+
 ```bash
 pyinstaller --noconsole --onefile --add-data "img:img" --name "MattermostNotifier-Linux" mattermost_notifier.py
 ```
 
 ### 🍏 macOS (Binary Executable)
+
 ```bash
 pyinstaller --noconsole --onefile --add-data "img:img" --name "MattermostNotifier-macOS" mattermost_notifier.py
 ```
 
 Troverai il file eseguibile compilato all'interno della cartella `dist/`.
+
 ---
 
 ## 📋 Configurazione Iniziale
