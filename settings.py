@@ -2,6 +2,7 @@ import os
 import json
 import keyring
 
+from keyring.errors import KeyringError
 from logger import log
 
 # --- COSTANTI & CONFIGURAZIONE ---
@@ -26,10 +27,10 @@ def load_settings():
     try:
         config["MATTERMOST_TOKEN"] = keyring.get_password(APP_NAME, "MATTERMOST_TOKEN") or ""
         config["TELEGRAM_BOT_TOKEN"] = keyring.get_password(APP_NAME, "TELEGRAM_BOT_TOKEN") or ""
-    except Exception as e:
-        log.error(f"Errore caricamento keyring: {e}")
-        config["MATTERMOST_TOKEN"] = ""
-        config["TELEGRAM_BOT_TOKEN"] = ""
+    except (KeyringError, Exception) as e:
+        log.error(f"Errore caricamento keyring (sistema o backend non supportato): {e}")
+        config["MATTERMOST_TOKEN"] = config.get("MATTERMOST_TOKEN", "")
+        config["TELEGRAM_BOT_TOKEN"] = config.get("TELEGRAM_BOT_TOKEN", "")
 
 
 def save_settings(ws_url, mm_token, tg_token, tg_chat_id):
@@ -51,5 +52,5 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id):
     try:
         keyring.set_password(APP_NAME, "MATTERMOST_TOKEN", mm_token)
         keyring.set_password(APP_NAME, "TELEGRAM_BOT_TOKEN", tg_token)
-    except Exception as e:
+    except (KeyringError, Exception) as e:
         log.error(f"Errore salvataggio keyring: {e}")

@@ -20,10 +20,6 @@ def make_circle_icon(active=True):
     painter.end()
     return QIcon(pixmap)
 
-# Definiamo i percorsi delle icone (messi ad esempio nella stessa cartella dello script)
-ICON_ACTIVE_PATH = "img/icon_active.ico"
-ICON_INACTIVE_PATH = "img/icon_inactive.ico"
-
 def resource_path(relative_path):
     """ Ottiene il percorso assoluto delle risorse, funziona sia in dev che con PyInstaller """
     if hasattr(sys, '_MEIPASS'):
@@ -31,8 +27,11 @@ def resource_path(relative_path):
     return os.path.join(os.path.abspath("."), relative_path)
 
 def get_tray_icon(active=True):
-    file = ICON_ACTIVE_PATH if active else ICON_INACTIVE_PATH
-    path = resource_path(file)
+    # Seleziona l'estensione più adatta all'OS
+    ext = "ico" if sys.platform.startswith("win") else "png"
+    filename = f"icon_active.{ext}" if active else f"icon_inactive.{ext}"
+    relative_path = os.path.join("img", filename)
+    path = resource_path(relative_path)
     
     # Verifica di sicurezza: se il file esiste lo carica, altrimenti restituisce un'icona vuota
     if os.path.exists(path):

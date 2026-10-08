@@ -1,6 +1,12 @@
 import os
 import sys
 
+# Compatibilità Linux/GNOME: previene il crash di GLib-GIO e i problemi con il display manager
+if sys.platform.startswith("linux"):
+    os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
+    os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
+    os.environ.setdefault("GSETTINGS_BACKEND", "memory")
+
 from settings import load_settings
 from MattermostApp import MattermostApp
 from PyQt6.QtWidgets import QApplication
@@ -27,7 +33,7 @@ def main():
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Icon.Warning)
         msg.setWindowTitle("Applicazione già in esecuzione")
-        msg.setText("Mattermost Notifier è già attivo nella tray area di Windows.")
+        msg.setText("Mattermost Notifier è già attivo nella tray area del sistema in uso.")
         msg.exec()
         sys.exit(0)
 
