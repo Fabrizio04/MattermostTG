@@ -119,3 +119,9 @@ Alla prima esecuzione:
    * **Telegram Bot Token** (ottenuto da `@BotFather`)
    * **Telegram Chat ID** (ottenuto da `@userinfobot`)
 3. Clicca su **Salva**. L'app si connetterà immediatamente!
+
+---
+
+## 📄 Licenza
+
+Questo progetto è distribuito sotto licenza **MIT**. Consulta il file [LICENSE](LICENSE) per maggiori dettagli.

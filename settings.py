@@ -11,7 +11,10 @@ CONFIG_FILE = "settings.json"
 
 config = {
     "MATTERMOST_WS_URL": "",
-    "TELEGRAM_CHAT_ID": ""
+    "TELEGRAM_CHAT_ID": "",
+    "EXCLUDED_SENDERS": "",
+    "EXCLUDED_CHANNELS": "",
+    "ECHO_SUPPRESSION_ENABLED": True
 }
 
 # --- CARICAMENTO / SALVATAGGIO SICURO ---
@@ -20,7 +23,8 @@ def load_settings():
     if os.path.exists(CONFIG_FILE):
         try:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-                config.update(json.load(f))
+                saved_data = json.load(f)
+                config.update(saved_data)
         except Exception as e:
             log.error(f"Errore caricamento json: {e}")
 
@@ -33,19 +37,26 @@ def load_settings():
         config["TELEGRAM_BOT_TOKEN"] = config.get("TELEGRAM_BOT_TOKEN", "")
 
 
-def save_settings(ws_url, mm_token, tg_token, tg_chat_id):
+def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excluded_channels, echo_suppression):
     global config
     config["MATTERMOST_WS_URL"] = ws_url
     config["TELEGRAM_CHAT_ID"] = tg_chat_id
     config["MATTERMOST_TOKEN"] = mm_token
     config["TELEGRAM_BOT_TOKEN"] = tg_token
+    config["EXCLUDED_SENDERS"] = excluded_senders
+    config["EXCLUDED_CHANNELS"] = excluded_channels
+    config["ECHO_SUPPRESSION_ENABLED"] = echo_suppression
 
     try:
         with open(CONFIG_FILE, "w", encoding="utf-8") as f:
             json.dump({
                 "MATTERMOST_WS_URL": ws_url,
-                "TELEGRAM_CHAT_ID": tg_chat_id
+                "TELEGRAM_CHAT_ID": tg_chat_id,
+                "EXCLUDED_SENDERS": excluded_senders,
+                "EXCLUDED_CHANNELS": excluded_channels,
+                "ECHO_SUPPRESSION_ENABLED": echo_suppression
             }, f, indent=4)
+        log.debug("Impostazioni salvate con successo.")
     except Exception as e:
         log.error(f"Errore salvataggio json: {e}")
 

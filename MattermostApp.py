@@ -4,8 +4,9 @@ import listen_mattermost
 
 from logger import log
 from PyQt6.QtGui import QAction
-from utils import make_circle_icon, get_tray_icon
-from SettingsDialog import SettingsDialog
+from ui.AboutDialog import AboutDialog
+from ui.SettingsDialog import SettingsDialog
+from func.utils import make_circle_icon, get_tray_icon
 from PyQt6.QtWidgets import (QSystemTrayIcon, QMenu)
 
 # --- APPLICATION CONTROLLER ---
@@ -13,11 +14,13 @@ class MattermostApp:
     def __init__(self, qapp):
         self.qapp = qapp
         self.settings_dialog = None  # Per evitare aperture doppie
+        self.about_dialog = None  # Per evitare aperture doppie
 
         # Tray Icon
         self.tray_icon = QSystemTrayIcon()
         self.update_icon()
         self.tray_icon.setToolTip("Mattermost Notifier")
+        self.tray_icon.activated.connect(self.on_tray_activated)
 
         # Menu Contestuale
         self.menu = QMenu()
@@ -31,6 +34,12 @@ class MattermostApp:
         self.action_settings = QAction("Impostazioni", self.menu)
         self.action_settings.triggered.connect(self.open_settings)
         self.menu.addAction(self.action_settings)
+
+        self.menu.addSeparator()
+
+        self.action_about = QAction("Informazioni...", self.menu)
+        self.action_about.triggered.connect(self.open_about)
+        self.menu.addAction(self.action_about)
 
         self.menu.addSeparator()
 
@@ -48,6 +57,14 @@ class MattermostApp:
         listen_mattermost.service_active = checked
         self.update_icon()
 
+    def on_tray_activated(self, reason):
+        # Se l'utente fa doppio clic, inattiva/attiva il servizio al volo
+        if reason == QSystemTrayIcon.ActivationReason.DoubleClick:
+            new_state = not listen_mattermost.service_active
+            # Aggiorna anche la spunta nel menu contestuale per coerenza
+            self.action_active.setChecked(new_state)
+            self.toggle_service(new_state)
+
     def update_icon(self):
         self.tray_icon.setIcon(get_tray_icon(listen_mattermost.service_active))
 
@@ -60,6 +77,15 @@ class MattermostApp:
         self.settings_dialog = SettingsDialog()
         self.settings_dialog.exec()
         self.settings_dialog = None
+
+    def open_about(self):
+        if self.about_dialog is not None and self.about_dialog.isVisible():
+            self.about_dialog.activateWindow()
+            return
+
+        self.about_dialog = AboutDialog()
+        self.about_dialog.exec()
+        self.about_dialog = None
 
     def quit(self):
         listen_mattermost.running = False

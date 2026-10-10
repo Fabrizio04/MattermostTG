@@ -5,16 +5,18 @@ import websockets
 from logger import log
 from settings import config
 from datetime import datetime
-from message import send_telegram
+from func.message import send_telegram
+from func.fetch_user_id import fetch_user_id
 
 # --- STATI APPLICAZIONE ---
 running = True
 service_active = True
 current_ws = None
 main_loop = None
+user_id = None
 
 async def listen_mattermost():
-    global running, service_active, current_ws, main_loop
+    global running, service_active, current_ws, main_loop, user_id
     main_loop = asyncio.get_running_loop()
 
     while running:
@@ -24,6 +26,8 @@ async def listen_mattermost():
         if not ws_url or not token:
             await asyncio.sleep(3)
             continue
+
+        user_id = fetch_user_id(ws_url, token)
 
         try:
             log.debug("Connessione al WebSocket Mattermost in corso...")
@@ -44,10 +48,35 @@ async def listen_mattermost():
                     
                     if data.get("event") == "posted":
                         post_data = json.loads(data["data"]["post"])
+
+                        # dati del messaggio
                         message_text = post_data.get("message", "N/D")
                         sender_name = data["data"].get("sender_name", "N/D")
                         channel_display_name = data["data"].get("channel_display_name", "N/D")
+                        post_user_id = post_data.get("user_id")
 
+                        # controllo automatico Echo Suppression tramite user_id
+                        if config.get("ECHO_SUPPRESSION_ENABLED", True):
+                            if user_id and post_user_id == user_id:
+                                log.debug("Messaggio scartato (Echo Suppression).")
+                                continue
+
+                        # verifica liste di esclusione
+                        excluded_senders_raw = config.get("EXCLUDED_SENDERS", "")
+                        excluded_channels_raw = config.get("EXCLUDED_CHANNELS", "")
+
+                        excluded_senders = {s.strip().lower() for s in excluded_senders_raw.replace(",", "\n").split("\n") if s.strip()}
+                        excluded_channels = {c.strip().lower() for c in excluded_channels_raw.replace(",", "\n").split("\n") if c.strip()}
+
+                        if sender_name.lower() in excluded_senders:
+                            log.debug(f"Messaggio scartato: mittente '{sender_name}' in lista di esclusione.")
+                            continue
+
+                        if channel_display_name.lower() in excluded_channels:
+                            log.debug(f"Messaggio scartato: canale '{channel_display_name}' in lista di esclusione.")
+                            continue
+
+                        # invio messaggio
                         create_at_ms = post_data.get("create_at")
                         if create_at_ms:
                             dt = datetime.fromtimestamp(create_at_ms / 1000.0)
