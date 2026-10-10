@@ -2,6 +2,7 @@
 
 Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed elegante creata in Python e PyQt6 per inoltrare le notifiche da **Mattermost** direttamente a un bot **Telegram** personalizzato.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![PyQt6](https://img.shields.io/badge/GUI-PyQt6-green.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
@@ -26,20 +27,25 @@ Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed e
 
 ```
 MattermostTG/
+├── func/
+    ├── fetch_user_id.py      # Funzione per salvataggio id utente
+    ├── message.py            # Invio chiamate API verso Telegram
+    └── utils.py              # Gestione percorsi risorse e icone
 ├── img/
     ├── icon_active.ico       # Icona per Windows (Attiva)
     ├── icon_inactive.ico     # Icona per Windows (Inattiva)
     ├── icon_active.png       # Icona per Linux / macOS (Attiva)
     ├── icon_inactive.png     # Icona per Linux / macOS (Inattiva)
     └── mattermost.af         # Progetto affinity
-├── mattermost_notifier.py    # Entry point dell'applicazione
+├── ui/
+    ├── AboutDialog.py        # Interfaccia GUI per le informazioni
+    ├── SettingsDialog.py     # Interfaccia GUI per la configurazione
+    └── ToggleSwitch.py       # Componente GUI toggle switch
 ├── MattermostApp.py          # Gestione System Tray e menu contestuale
-├── SettingsDialog.py         # Interfaccia GUI per la configurazione
 ├── listen_mattermost.py      # Gestione ciclo eventi WebSocket asyncio
-├── message.py                # Invio chiamate API verso Telegram
-├── settings.py               # Lettura/scrittura configurazioni e keyring
 ├── logger.py                 # Sistema di logging centralizzato
-└── utils.py                  # Gestione percorsi risorse e icone
+├── mattermost_notifier.py    # Entry point dell'applicazione
+└── settings.py               # Lettura/scrittura configurazioni e keyring
 ```
 
 ---
@@ -124,4 +130,4 @@ Alla prima esecuzione:
 
 ## 📄 Licenza
 
-Questo progetto è distribuito sotto licenza **MIT**. Consulta il file [LICENSE](LICENSE) per maggiori dettagli.
+Questo progetto è distribuito sotto licenza **MIT**. Consulta il file [LICENSE](LICENSE.txt) per maggiori dettagli.
