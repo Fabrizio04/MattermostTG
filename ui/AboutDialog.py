@@ -1,9 +1,12 @@
+import os
+
 from PyQt6.QtWidgets import  (
     QDialog, QVBoxLayout, QLabel, QPushButton
 )
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QIcon
+from func.utils import resource_path
 
 class AboutDialog(QDialog):
     def __init__(self, parent=None):
@@ -11,6 +14,7 @@ class AboutDialog(QDialog):
         self.setWindowTitle("Informazioni su Mattermost Notifier")
         self.setFixedSize(380, 260)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint | Qt.WindowType.WindowStaysOnTopHint)
+        self.setWindowIcon(QIcon(resource_path(os.path.join("img", "icon_active.png"))))
 
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)

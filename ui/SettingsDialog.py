@@ -1,12 +1,19 @@
+import os
+import keyring
+
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel,
-    QLineEdit, QPushButton, QMessageBox, QTextEdit
+    QLineEdit, QPushButton, QMessageBox, QTextEdit, QFrame
 )
 
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon
+from settings import APP_NAME
+from settings import CONFIG_FILE
+from func.utils import resource_path
 from ui.ToggleSwitch import ToggleSwitch
 from settings import config, save_settings
-from listen_mattermost import reconnect_websocket 
+from listen_mattermost import reconnect_websocket
 
 # --- FINESTRA IMPOSTAZIONI ---
 class SettingsDialog(QDialog):
@@ -15,6 +22,7 @@ class SettingsDialog(QDialog):
         self.setWindowTitle("Impostazioni Mattermost Notifier")
         self.setFixedSize(450, 420)
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
+        self.setWindowIcon(QIcon(resource_path(os.path.join("img", "icon_active.png"))))
 
         layout = QVBoxLayout()
 
@@ -48,6 +56,11 @@ class SettingsDialog(QDialog):
         h4.addWidget(self.txt_tg_chat_id)
         layout.addLayout(h4)
 
+        line = QFrame()
+        line.setFrameShape(QFrame.Shape.HLine)
+        line.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(line)
+
         # Esclusione Mittenti
         layout.addWidget(QLabel("Mittenti da scartare (uno per riga o separati da virgola):"))
         self.txt_excluded_senders = QTextEdit()
@@ -61,6 +74,11 @@ class SettingsDialog(QDialog):
         self.txt_excluded_channels.setMaximumHeight(60)
         self.txt_excluded_channels.setText(config.get("EXCLUDED_CHANNELS", ""))
         layout.addWidget(self.txt_excluded_channels)
+
+        line = QFrame()
+        line.setFrameShape(QFrame.Shape.HLine)
+        line.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(line)
 
         # Checkbox Echo Suppression
         # self.chk_echo = QCheckBox("Filtra automaticamente i miei messaggi (Echo Suppression)")
@@ -76,12 +94,63 @@ class SettingsDialog(QDialog):
         h_echo.addWidget(self.chk_echo)
         layout.addLayout(h_echo)
 
+        line = QFrame()
+        line.setFrameShape(QFrame.Shape.HLine)
+        line.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(line)
+
         # Bottone Salva
         self.btn_save = QPushButton("Salva Impostazioni")
+        self.btn_save.setStyleSheet("background-color: #00b4d8; color: #ffffff;")
         self.btn_save.clicked.connect(self.save)
         layout.addWidget(self.btn_save)
 
+        # Pulsante Reset
+        self.btn_reset = QPushButton("Ripristina Predefiniti")
+        self.btn_reset.setStyleSheet("background-color: #fc473a; color: #ffffff;")
+        self.btn_reset.clicked.connect(self.reset_settings)
+        layout.addWidget(self.btn_reset)
+
         self.setLayout(layout)
+
+    def reset_settings(self):
+        # Chiediamo conferma prima di resettare
+        confirm = QMessageBox.question(
+            self,
+            "Conferma Reset",
+            "Sei sicuro di voler ripristinare le impostazioni predefinite?\nTutti i campi e i token salvati verranno cancellati.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
+        )
+        
+        if confirm == QMessageBox.StandardButton.Yes:
+            # Pulisciamo i campi di testo
+            self.txt_ws_url.clear()
+            self.txt_mm_token.clear()
+            self.txt_tg_token.clear()
+            self.txt_tg_chat_id.clear()
+            self.txt_excluded_senders.clear()
+            self.txt_excluded_channels.clear()
+            
+            # Riportiamo il toggle echo suppression sullo stato predefinito (True)
+            self.chk_echo.setChecked(True)
+            
+            # Cancelliamo fisicamente il file di configurazione se esiste
+            if os.path.exists(CONFIG_FILE):
+                try:
+                    os.remove(CONFIG_FILE)
+                except Exception as e:
+                    print(f"Errore rimozione file config: {e}")
+            
+            # Rimuoviamo anche i token dal keyring di sistema
+            try:
+                keyring.delete_password(APP_NAME, "MATTERMOST_TOKEN")
+                keyring.delete_password(APP_NAME, "TELEGRAM_BOT_TOKEN")
+            except Exception:
+                pass  # Se non esistono nel keyring, ignoriamo l'eccezione
+
+            # Notifica visiva all'utente
+            QMessageBox.information(self, "Reset Completato", "Le impostazioni sono state ripristinate con successo.")
 
     def save(self):
         save_settings(

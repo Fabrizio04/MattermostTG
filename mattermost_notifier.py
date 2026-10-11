@@ -10,9 +10,9 @@ if sys.platform.startswith("linux"):
 from settings import load_settings
 from MattermostApp import MattermostApp
 from PyQt6.QtWidgets import QApplication
-
-from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtCore import QLockFile, QDir
+from func.parse_arguments import parse_arguments
+from PyQt6.QtWidgets import QApplication, QMessageBox
 
 from logger import log
 
@@ -44,4 +44,5 @@ def main():
     sys.exit(app.exec())
 
 if __name__ == "__main__":
+    parse_arguments()
     main()

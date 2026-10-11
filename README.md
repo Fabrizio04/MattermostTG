@@ -30,13 +30,15 @@ MattermostTG/
 ├── func/
     ├── fetch_user_id.py      # Funzione per salvataggio id utente
     ├── message.py            # Invio chiamate API verso Telegram
+    ├── parse_arguments.py    # Funzione per gestione argomenti
     └── utils.py              # Gestione percorsi risorse e icone
 ├── img/
     ├── icon_active.ico       # Icona per Windows (Attiva)
     ├── icon_inactive.ico     # Icona per Windows (Inattiva)
     ├── icon_active.png       # Icona per Linux / macOS (Attiva)
     ├── icon_inactive.png     # Icona per Linux / macOS (Inattiva)
-    └── mattermost.af         # Progetto affinity
+    ├── mattermosttg.af       # Progetto affinity
+    └── mattermosttg.svg      # Immagine vettoriale
 ├── ui/
     ├── AboutDialog.py        # Interfaccia GUI per le informazioni
     ├── SettingsDialog.py     # Interfaccia GUI per la configurazione
@@ -104,6 +106,8 @@ py -m PyInstaller --noconsole --onefile --add-data "img;img" --icon="img/icon_ac
 ```bash
 pyinstaller --noconsole --onefile --add-data "img:img" --name "MattermostNotifier-Linux" mattermost_notifier.py
 ```
+
+Per una guida dettagliata all'installazione permanente e all'integrazione nel menu di sistema su distribuzioni Linux, consulta la [Guida Linux](LINUX_DEPLOY.md).
 
 ### 🍏 macOS (Binary Executable)
 
