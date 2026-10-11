@@ -15,6 +15,7 @@ Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed e
 * **Connessione WebSocket**: Ascolto in tempo reale degli eventi Mattermost senza carico sul server.
 * **Sicurezza Avanzata**:
   * I token sensibili (Mattermost e Telegram) sono salvati in modo sicuro nel gestore credenziali di sistema (**Windows Credential Manager**, **Secret Service/KWallet**, **macOS Keychain**) tramite `keyring` con fallback graceful.
+  * È possibile inoltrare i messaggi usando lo standard di crittografia `AES-256`
   * Le impostazioni generali non sensibili sono salvate in locale su `mattermosttg.json`.
 * **Compatibilità Linux/GNOME**: Gestione automatica del backend grafico (`xcb`/`wayland`) e isolamento da bug di temi GTK3/GLib per evitare crash di sistema.
 * **Riconnessione al volo**: Modificando l'URL o il token nelle impostazioni, il WebSocket viene ricreato automaticamente senza dover riavviare l'applicazione.
@@ -88,7 +89,7 @@ MattermostTG/
 
 5. **Installa le dipendenze Python:**
    ```bash
-   pip install PyQt6 websockets requests keyring pyinstaller
+   pip install PyQt6 websockets requests keyring cryptography pyinstaller
    ```
 
 6. **Avvia l'applicazione:**
@@ -112,7 +113,7 @@ py -m PyInstaller --noconsole --onefile --add-data "img;img" --icon="img/icon_ac
 pyinstaller --noconsole --onefile --add-data "img:img" --name "MattermostNotifier-Linux" mattermost_notifier.py
 ```
 
-Per una guida dettagliata all'installazione permanente e all'integrazione nel menu di sistema su distribuzioni Linux, consulta la [Guida Linux](LINUX_DEPLOY.md).
+Per una guida dettagliata all'installazione permanente e all'integrazione nel menu di sistema su distribuzioni Linux, consulta la [Guida Linux](doc/LINUX_DEPLOY.md).
 
 ### 🍏 macOS (Binary Executable)
 
@@ -126,7 +127,7 @@ Troverai il file eseguibile compilato all'interno della cartella `dist/`.
 
 ## ⚙️ Avvio Automatico (Autostart)
 
-Per una guida dettagliata sulla configurazione dell'avvio automatico, consulta la [Guida Autostart](AUTOSTART.md).
+Per una guida dettagliata sulla configurazione dell'avvio automatico, consulta la [Guida Autostart](doc/AUTOSTART.md).
 
 ---
 
@@ -137,8 +138,8 @@ Alla prima esecuzione:
 2. Inserisci:
    * **URL WebSocket Mattermost** (es. `wss://mattermost.tuodominio.it/api/v4/websocket`)
    * **Token Personal Access Mattermost**
-   * **Telegram Bot Token** (ottenuto da `@BotFather`)
-   * **Telegram Chat ID** (ottenuto da `@userinfobot`)
+   * **Telegram Bot Token** (ottenuto da [@BotFather](https://telegram.me/BotFather))
+   * **Telegram Chat ID** (ottenuto da [@userinfobot](https://telegram.me/userinfobot))
 3. Clicca su **Salva**. L'app si connetterà immediatamente!
 
 ---
