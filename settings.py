@@ -18,7 +18,8 @@ config = {
     "ANONYMOUS_MODE": False,
     "INCLUDE_SENDER": True,
     "INCLUDE_CHANNEL": True,
-    "INCLUDE_MESSAGE": True
+    "INCLUDE_MESSAGE": True,
+    "AES_ENCRYPTION_ENABLED": False
 }
 
 # --- CARICAMENTO / SALVATAGGIO SICURO ---
@@ -41,7 +42,23 @@ def load_settings():
         config["TELEGRAM_BOT_TOKEN"] = config.get("TELEGRAM_BOT_TOKEN", "")
 
 
-def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excluded_channels, echo_suppression, anonymous_mode, include_sender, include_channel, include_message):
+def reset_settings():
+    global config
+    config["MATTERMOST_WS_URL"] = ""
+    config["TELEGRAM_CHAT_ID"] = ""
+    config["MATTERMOST_TOKEN"] = ""
+    config["TELEGRAM_BOT_TOKEN"] = ""
+    config["EXCLUDED_SENDERS"] = ""
+    config["EXCLUDED_CHANNELS"] = ""
+    config["ECHO_SUPPRESSION_ENABLED"] = True
+    config["ANONYMOUS_MODE"] = False
+    config["INCLUDE_SENDER"] = True
+    config["INCLUDE_CHANNEL"] = True
+    config["INCLUDE_MESSAGE"] = True
+    config["AES_ENCRYPTION_ENABLED"] = False
+
+
+def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excluded_channels, echo_suppression, anonymous_mode, include_sender, include_channel, include_message, aes_enabled):
     global config
     config["MATTERMOST_WS_URL"] = ws_url
     config["TELEGRAM_CHAT_ID"] = tg_chat_id
@@ -54,6 +71,7 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excl
     config["INCLUDE_SENDER"] = include_sender
     config["INCLUDE_CHANNEL"] = include_channel
     config["INCLUDE_MESSAGE"] = include_message
+    config["AES_ENCRYPTION_ENABLED"] = aes_enabled
 
     try:
         with open(CONFIG_FILE, "w", encoding="utf-8") as f:
@@ -66,7 +84,8 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excl
                 "ANONYMOUS_MODE": anonymous_mode,
                 "INCLUDE_SENDER": include_sender,
                 "INCLUDE_CHANNEL": include_channel,
-                "INCLUDE_MESSAGE": include_message
+                "INCLUDE_MESSAGE": include_message,
+                "AES_ENCRYPTION_ENABLED": aes_enabled
             }, f, indent=4)
         log.debug("Impostazioni salvate con successo.")
     except Exception as e:

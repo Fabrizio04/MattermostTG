@@ -15,7 +15,7 @@ current_ws = None
 main_loop = None
 user_id = None
 
-async def listen_mattermost():
+async def mattermost_listener():
     global running, service_active, current_ws, main_loop, user_id
     main_loop = asyncio.get_running_loop()
 
@@ -80,12 +80,15 @@ async def listen_mattermost():
                         create_at_ms = post_data.get("create_at")
                                                 
                         notification_msg = format_notification(create_at_ms, channel_display_name, sender_name, message_text)
-                        log.debug(notification_msg)
-                        
-                        if service_active:
-                            send_telegram(notification_msg)
+                        log.debug(f"Messaggio formattato: {notification_msg}")
+
+                        if not notification_msg:
+                            log.warning("Messaggio formattato non valido")
                         else:
-                            log.warning("Servizio in pausa: notifica ignorata")
+                            if service_active:
+                                send_telegram(notification_msg)
+                            else:
+                                log.warning("Servizio in pausa: notifica ignorata")
 
         #except websockets.exceptions.ConnectionClosed:
             #log.debug("Connessione WebSocket chiusa.")
@@ -111,4 +114,4 @@ def reconnect_websocket():
 def run_websocket_loop():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(listen_mattermost())
+    loop.run_until_complete(mattermost_listener())

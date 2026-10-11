@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Fabrizio04/MattermostTG/refs/heads/main/img/icon_active.ico" />
+    <title>Decifratore AES-256</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 20px;
+            background: #121212;
+            color: #fff;
+        }
+
+        textarea,
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #222;
+            color: #fff;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #0088cc;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        #risultato {
+            margin-bottom: 20px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #1e293b;
+            border-radius: 8px;
+            font-size: 18px;
+            word-break: break-word;
+            min-height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>🔐 Decifratore Notifiche</h2>
+
+    <label>Chiave AES-256 (Hex 64 caratteri):</label>
+    <input type="password" id="keyHex" value="===MY_PRIVATE_KEY===">
+
+    <label>Messaggio:</label>
+    <textarea id="payloadBase64" rows="4" placeholder="Incolla qui il testo ricevuto..."></textarea>
+
+    <button id="decifra" disabled>🔓 Decifra Messaggio</button>
+
+    <h3>Messaggio in Chiaro:</h3>
+    <div id="risultato">...</div>
+
+    <button id="btnCopy" disabled>📋 Copia Messaggio</button>
+
+    <script>
+        const inputKey = document.getElementById('keyHex');
+        const inputPayload = document.getElementById('payloadBase64');
+        const btnDecifra = document.getElementById('decifra');
+        const btnCopy = document.getElementById('btnCopy');
+        const divRisultato = document.getElementById('risultato');
+
+        const ERRORE_TESTO = "❌ Errore nella decifrazione! Verifica la chiave o il messaggio.";
+
+        aggiornaStatoBottoni = () => {
+            const haChiave = inputKey.value.trim().length > 0;
+            const haPayload = inputPayload.value.trim().length > 0;
+
+            btnDecifra.disabled = !(haChiave && haPayload);
+
+            const testoRisultato = divRisultato.innerText.trim();
+            const haRisultatoValido = testoRisultato !== "..." && testoRisultato !== ERRORE_TESTO;
+            btnCopy.disabled = !haRisultatoValido;
+        };
+
+        inputKey.addEventListener('input', aggiornaStatoBottoni);
+        inputPayload.addEventListener('input', aggiornaStatoBottoni);
+
+        btnCopy.addEventListener("click", async () => {
+            const testoDaCopiare = divRisultato.innerText;
+            try {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(testoDaCopiare);
+                } else {
+                    const textareaTemp = document.createElement("textarea");
+                    textareaTemp.value = testoDaCopiare;
+                    document.body.appendChild(textareaTemp);
+                    textareaTemp.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textareaTemp);
+                }
+
+                const testoOriginale = btnCopy.innerText;
+                btnCopy.innerText = "✅ Copiato negli appunti!";
+                setTimeout(() => {
+                    btnCopy.innerText = testoOriginale;
+                }, 2000);
+            } catch (err) {
+                alert("Impossibile copiare il testo.");
+            }
+        });
+
+        divRisultato.addEventListener("click", () => {
+            const range = document.createRange();
+            range.selectNodeContents(divRisultato);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+        });
+
+        btnDecifra.addEventListener("click", async () => {
+            const keyHex = inputKey.value.trim();
+            const payloadB64 = inputPayload.value.trim();
+
+            if (keyHex.length === 0 || payloadB64.length === 0) return;
+
+            try {
+                // Converte la chiave esadecimale in dati binari
+                const keyBytes = new Uint8Array(keyHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
+                // Importa la chiave nel Crypto Engine del browser
+                const cryptoKey = await window.crypto.subtle.importKey(
+                    "raw", keyBytes, { name: "AES-GCM" }, false, ["decrypt"]
+                );
+
+                // Decodifica il Base64
+                const binaryString = atob(payloadB64);
+                const data = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    data[i] = binaryString.charCodeAt(i);
+                }
+
+                // Estrae il Nonce (primi 12 byte) e il testo cifrato (il resto)
+                const nonce = data.slice(0, 12);
+                const ciphertext = data.slice(12);
+
+                // Decifra
+                const decryptedBuffer = await window.crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: nonce },
+                    cryptoKey,
+                    ciphertext
+                );
+
+                const decodedText = new TextDecoder().decode(decryptedBuffer);
+                divRisultato.innerText = decodedText;
+                divRisultato.style.color = "#4ade80"; // Verde
+            } catch (e) {
+                divRisultato.innerText = ERRORE_TESTO;
+                divRisultato.style.color = "#f87171"; // Rosso
+            }
+
+            // Aggiorna lo stato dei bottoni dopo il tentativo di decifrazione
+            aggiornaStatoBottoni();
+        });
+
+        aggiornaStatoBottoni();
+    </script>
+</body>
+
+</html>

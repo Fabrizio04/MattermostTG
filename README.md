@@ -27,7 +27,10 @@ Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed e
 
 ```
 MattermostTG/
+├── aes/
+    └── decrypter.html          # Webapp per decifrazione AES-256
 ├── func/
+    ├── aes.py                  # Gestione crittografia AES-256
     ├── create_toggle_row.py    # Funzione per creazione toggle row
     ├── fetch_user_id.py        # Funzione per salvataggio id utente
     ├── format_notification.py  # Funzione per formattazione notifica
@@ -45,10 +48,10 @@ MattermostTG/
     ├── AboutDialog.py          # Interfaccia GUI per le informazioni
     ├── SettingsDialog.py       # Interfaccia GUI per la configurazione
     └── ToggleSwitch.py         # Componente GUI toggle switch
-├── MattermostApp.py            # Gestione System Tray e menu contestuale
-├── listen_mattermost.py        # Gestione ciclo eventi WebSocket asyncio
 ├── logger.py                   # Sistema di logging centralizzato
+├── mattermost_listener.py      # Gestione ciclo eventi WebSocket asyncio
 ├── mattermost_notifier.py      # Entry point dell'applicazione
+├── MattermostApp.py            # Gestione System Tray e menu contestuale
 └── settings.py                 # Lettura/scrittura configurazioni e keyring
 ```
 

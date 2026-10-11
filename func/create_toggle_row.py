@@ -2,7 +2,7 @@ from settings import config
 from ui.ToggleSwitch import ToggleSwitch
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel
 
-def create_toggle_row(label_text, default_val):
+def create_toggle_row(label_text, default_val, fallback = True):
     container = QWidget()
     container.setFixedHeight(30)
 
@@ -11,7 +11,7 @@ def create_toggle_row(label_text, default_val):
 
     lbl = QLabel(label_text)
     toggle = ToggleSwitch()
-    toggle.setChecked(config.get(default_val, True))
+    toggle.setChecked(config.get(default_val, fallback))
 
     h_layout.addWidget(lbl)
     h_layout.addStretch()

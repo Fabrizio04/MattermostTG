@@ -4,23 +4,23 @@ import keyring
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel,
     QLineEdit, QPushButton, QMessageBox, QTextEdit,
-    QFrame, QGroupBox, QVBoxLayout
+    QFrame, QGroupBox, QVBoxLayout, QFileDialog
 )
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from func.utils import resource_path
-from ui.ToggleSwitch import ToggleSwitch
-from listen_mattermost import reconnect_websocket
+from func.aes import get_or_create_aes_key
+from mattermost_listener import reconnect_websocket
 from func.create_toggle_row import create_toggle_row
-from settings import APP_NAME, CONFIG_FILE, config, save_settings
+from settings import APP_NAME, CONFIG_FILE, config, save_settings, reset_settings
 
 # --- FINESTRA IMPOSTAZIONI ---
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Impostazioni Mattermost Notifier")
-        self.setFixedSize(450, 610)
+        self.setFixedSize(450, 690)
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
         self.setWindowIcon(QIcon(resource_path(os.path.join("img", "icon_active.png"))))
 
@@ -80,33 +80,17 @@ class SettingsDialog(QDialog):
         line.setFrameShadow(QFrame.Shadow.Sunken)
         layout.addWidget(line)
 
+        # Crittografia AES-256
+        self.row_aes, self.toggle_aes = create_toggle_row("Crittografia Contenuto AES-256", "AES_ENCRYPTION_ENABLED", False)
+        layout.addWidget(self.row_aes)
+
         # Checkbox Echo Suppression
-        # self.chk_echo = QCheckBox("Filtra automaticamente i miei messaggi (Echo Suppression)")
-        # self.chk_echo.setChecked(config.get("ECHO_SUPPRESSION_ENABLED", True))
-        # layout.addWidget(self.chk_echo)
-        h_echo = QHBoxLayout()
-        lbl_echo = QLabel("Filtra automaticamente i miei messaggi (Echo Suppression):")
-        self.chk_echo = ToggleSwitch()
-        self.chk_echo.setChecked(config.get("ECHO_SUPPRESSION_ENABLED", True))
-        
-        h_echo.addWidget(lbl_echo)
-        h_echo.addStretch()  # Spinge il toggle a destra
-        h_echo.addWidget(self.chk_echo)
-        layout.addLayout(h_echo)
+        self.row_echo, self.chk_echo = create_toggle_row("Filtra automaticamente i miei messaggi (Echo Suppression)", "ECHO_SUPPRESSION_ENABLED")
+        layout.addWidget(self.row_echo)
 
         # Checkbox modalità anonima
-        h_anon = QHBoxLayout()
-        lbl_anon = QLabel("Modalità Anonima (nascondi dettagli):")
-        self.toggle_anon = ToggleSwitch()
-        self.toggle_anon.setChecked(config.get("ANONYMOUS_MODE", False))
-
-        # Colleghiamo il segnale per disabilitare/abilitare i campi sottostanti
-        self.toggle_anon.stateChanged.connect(self.toggle_anonymous_mode)
-
-        h_anon.addWidget(lbl_anon)
-        h_anon.addStretch()
-        h_anon.addWidget(self.toggle_anon)
-        layout.addLayout(h_anon)
+        self.row_anon, self.toggle_anon = create_toggle_row("Modalità Anonima (nascondi dettagli)", "ANONYMOUS_MODE")
+        layout.addWidget(self.row_anon)
 
         # GroupBox per i campi granulari (attivi se Anonimo è disattivato)
         self.group_granular = QGroupBox("Campi da includere nelle notifiche:")
@@ -143,11 +127,58 @@ class SettingsDialog(QDialog):
         self.btn_reset.clicked.connect(self.reset_settings)
         layout.addWidget(self.btn_reset)
 
+        # Pulsante per scaricare il decifratore HTML con la chiave pre-iniettata
+        self.btn_download_decrypter = QPushButton("Scarica Decifratore HTML (AES-256)")
+        self.btn_download_decrypter.setStyleSheet("background-color: #2b2d42; color: #f3f3f3;")
+        self.btn_download_decrypter.clicked.connect(self.download_decrypter_html)
+        layout.addWidget(self.btn_download_decrypter)
+
         self.setLayout(layout)
 
     def toggle_anonymous_mode(self, state):
         is_checked = (state == 2 or state is True)
         self.group_granular.setEnabled(not is_checked)
+
+    def download_decrypter_html(self):
+
+        # Recupera la chiave reale dell'utente (la genera se non esiste)
+        user_key = get_or_create_aes_key()
+
+        # Percorso del template decrypter.html originario (nella stessa cartella del progetto o risorse)
+        template_path = resource_path(os.path.join("aes", "decrypter.html"))
+        
+        if not os.path.exists(template_path):
+            QMessageBox.warning(self, "Attenzione", "File template 'decrypter.html' non trovato nella directory dell'applicazione.")
+            return
+
+        try:
+            with open(template_path, "r", encoding="utf-8") as f:
+                html_content = f.read()
+
+            # Sostituiamo la chiave di esempio nel file HTML con quella vera dell'utente
+            chiave_esempio = "===MY_PRIVATE_KEY==="
+            if chiave_esempio in html_content:
+                html_content = html_content.replace(chiave_esempio, user_key)
+            else:
+                # Fallback di sicurezza nel caso l'input avesse un ID diverso nel tag HTML
+                # Cerchiamo l'input value o iniettiamo direttamente via stringa
+                pass
+
+            # Chiediamo all'utente dove salvare il file personalizzato
+            file_path, _ = QFileDialog.getSaveFileName(
+                self,
+                "Salva Decifratore AES",
+                "decrypter_personale.html",
+                "File HTML (*.html)"
+            )
+
+            if file_path:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(html_content)
+                QMessageBox.information(self, "Download Completato", f"Il decifratore personalizzato è stato salvato con successo in:\n{file_path}")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Errore", f"Impossibile generare il file di decifrazione: {e}")
 
     def reset_settings(self):
         # Chiediamo conferma prima di resettare
@@ -174,6 +205,7 @@ class SettingsDialog(QDialog):
             self.toggle_sender.setChecked(True)
             self.toggle_channel.setChecked(True)
             self.toggle_message.setChecked(True)
+            self.toggle_aes.setChecked(False)
             
             # Cancelliamo fisicamente il file di configurazione se esiste
             if os.path.exists(CONFIG_FILE):
@@ -185,10 +217,21 @@ class SettingsDialog(QDialog):
             # Rimuoviamo anche i token dal keyring di sistema
             try:
                 keyring.delete_password(APP_NAME, "MATTERMOST_TOKEN")
+            except Exception:
+                pass
+
+            try:
                 keyring.delete_password(APP_NAME, "TELEGRAM_BOT_TOKEN")
             except Exception:
-                pass  # Se non esistono nel keyring, ignoriamo l'eccezione
+                pass
 
+            try:
+                keyring.delete_password(APP_NAME, "AES_ENCRYPTION_KEY")
+            except Exception:
+                pass
+
+            reset_settings()
+            
             # Notifica visiva all'utente
             QMessageBox.information(self, "Reset Completato", "Le impostazioni sono state ripristinate con successo.")
 
@@ -204,7 +247,8 @@ class SettingsDialog(QDialog):
             self.toggle_anon.isChecked(),
             self.toggle_sender.isChecked(),
             self.toggle_channel.isChecked(),
-            self.toggle_message.isChecked()
+            self.toggle_message.isChecked(),
+            self.toggle_aes.isChecked()
         )
 
         reconnect_websocket()

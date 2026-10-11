@@ -1,6 +1,6 @@
 # import os
 import threading
-import listen_mattermost
+import mattermost_listener
 
 from logger import log
 from PyQt6.QtGui import QAction
@@ -51,22 +51,22 @@ class MattermostApp:
         self.tray_icon.show()
 
         # Avvio WebSocket
-        threading.Thread(target=listen_mattermost.run_websocket_loop, daemon=True).start()
+        threading.Thread(target=mattermost_listener.run_websocket_loop, daemon=True).start()
 
     def toggle_service(self, checked):
-        listen_mattermost.service_active = checked
+        mattermost_listener.service_active = checked
         self.update_icon()
 
     def on_tray_activated(self, reason):
         # Se l'utente fa doppio clic, inattiva/attiva il servizio al volo
         if reason == QSystemTrayIcon.ActivationReason.DoubleClick:
-            new_state = not listen_mattermost.service_active
+            new_state = not mattermost_listener.service_active
             # Aggiorna anche la spunta nel menu contestuale per coerenza
             self.action_active.setChecked(new_state)
             self.toggle_service(new_state)
 
     def update_icon(self):
-        self.tray_icon.setIcon(get_tray_icon(listen_mattermost.service_active))
+        self.tray_icon.setIcon(get_tray_icon(mattermost_listener.service_active))
 
     def open_settings(self):
         # Se la finestra è già aperta, la porta in primo piano senza crearne una nuova
@@ -88,7 +88,7 @@ class MattermostApp:
         self.about_dialog = None
 
     def quit(self):
-        listen_mattermost.running = False
+        mattermost_listener.running = False
         self.tray_icon.hide()
         self.qapp.quit()
         log.info("Servizio terminato")
