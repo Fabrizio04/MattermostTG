@@ -28,26 +28,28 @@ Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed e
 ```
 MattermostTG/
 ├── func/
-    ├── fetch_user_id.py      # Funzione per salvataggio id utente
-    ├── message.py            # Invio chiamate API verso Telegram
-    ├── parse_arguments.py    # Funzione per gestione argomenti
-    └── utils.py              # Gestione percorsi risorse e icone
+    ├── create_toggle_row.py    # Funzione per creazione toggle row
+    ├── fetch_user_id.py        # Funzione per salvataggio id utente
+    ├── format_notification.py  # Funzione per formattazione notifica
+    ├── message.py              # Invio chiamate API verso Telegram
+    ├── parse_arguments.py      # Funzione per gestione argomenti
+    └── utils.py                # Gestione percorsi risorse e icone
 ├── img/
-    ├── icon_active.ico       # Icona per Windows (Attiva)
-    ├── icon_inactive.ico     # Icona per Windows (Inattiva)
-    ├── icon_active.png       # Icona per Linux / macOS (Attiva)
-    ├── icon_inactive.png     # Icona per Linux / macOS (Inattiva)
-    ├── mattermosttg.af       # Progetto affinity
-    └── mattermosttg.svg      # Immagine vettoriale
+    ├── icon_active.ico         # Icona per Windows (Attiva)
+    ├── icon_inactive.ico       # Icona per Windows (Inattiva)
+    ├── icon_active.png         # Icona per Linux / macOS (Attiva)
+    ├── icon_inactive.png       # Icona per Linux / macOS (Inattiva)
+    ├── mattermosttg.af         # Progetto affinity
+    └── mattermosttg.svg        # Immagine vettoriale
 ├── ui/
-    ├── AboutDialog.py        # Interfaccia GUI per le informazioni
-    ├── SettingsDialog.py     # Interfaccia GUI per la configurazione
-    └── ToggleSwitch.py       # Componente GUI toggle switch
-├── MattermostApp.py          # Gestione System Tray e menu contestuale
-├── listen_mattermost.py      # Gestione ciclo eventi WebSocket asyncio
-├── logger.py                 # Sistema di logging centralizzato
-├── mattermost_notifier.py    # Entry point dell'applicazione
-└── settings.py               # Lettura/scrittura configurazioni e keyring
+    ├── AboutDialog.py          # Interfaccia GUI per le informazioni
+    ├── SettingsDialog.py       # Interfaccia GUI per la configurazione
+    └── ToggleSwitch.py         # Componente GUI toggle switch
+├── MattermostApp.py            # Gestione System Tray e menu contestuale
+├── listen_mattermost.py        # Gestione ciclo eventi WebSocket asyncio
+├── logger.py                   # Sistema di logging centralizzato
+├── mattermost_notifier.py      # Entry point dell'applicazione
+└── settings.py                 # Lettura/scrittura configurazioni e keyring
 ```
 
 ---
