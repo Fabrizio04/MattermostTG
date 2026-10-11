@@ -14,8 +14,8 @@ dist/
 *.spec
 
 # File di dati sensibili e configurazioni locali
-settings.json
-app.log
+mattermosttg.json
+mattermosttg.log
 
 # IDE & Editor Settings
 .vscode/

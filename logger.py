@@ -2,7 +2,7 @@ import sys
 import logging
 
 # Configurazione del logger di sistema
-LOG_FILENAME = "app.log"
+LOG_FILENAME = "mattermosttg.log"
 
 def setup_logger(level=logging.INFO):
     """

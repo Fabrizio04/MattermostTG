@@ -15,11 +15,11 @@ Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed e
 * **Connessione WebSocket**: Ascolto in tempo reale degli eventi Mattermost senza carico sul server.
 * **Sicurezza Avanzata**:
   * I token sensibili (Mattermost e Telegram) sono salvati in modo sicuro nel gestore credenziali di sistema (**Windows Credential Manager**, **Secret Service/KWallet**, **macOS Keychain**) tramite `keyring` con fallback graceful.
-  * Le impostazioni generali non sensibili sono salvate in locale su `settings.json`.
+  * Le impostazioni generali non sensibili sono salvate in locale su `mattermosttg.json`.
 * **Compatibilità Linux/GNOME**: Gestione automatica del backend grafico (`xcb`/`wayland`) e isolamento da bug di temi GTK3/GLib per evitare crash di sistema.
 * **Riconnessione al volo**: Modificando l'URL o il token nelle impostazioni, il WebSocket viene ricreato automaticamente senza dover riavviare l'applicazione.
 * **Notifiche Formattate**: Ricevi la data e l'ora del messaggio, il nome del mittente e il canale direttamente su Telegram.
-* **Logging personalizzato**: Tracciamento di eventi ed errori su console e file locale `app.log`.
+* **Logging personalizzato**: Tracciamento di eventi ed errori su console e file locale `mattermosttg.log`.
 
 ---
 
@@ -116,6 +116,12 @@ pyinstaller --noconsole --onefile --add-data "img:img" --name "MattermostNotifie
 ```
 
 Troverai il file eseguibile compilato all'interno della cartella `dist/`.
+
+---
+
+## ⚙️ Avvio Automatico (Autostart)
+
+Per una guida dettagliata sulla configurazione dell'avvio automatico, consulta la [Guida Autostart](AUTOSTART.md).
 
 ---
 

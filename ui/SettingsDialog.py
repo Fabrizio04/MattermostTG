@@ -3,24 +3,24 @@ import keyring
 
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel,
-    QLineEdit, QPushButton, QMessageBox, QTextEdit, QFrame
+    QLineEdit, QPushButton, QMessageBox, QTextEdit,
+    QFrame, QGroupBox, QVBoxLayout
 )
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
-from settings import APP_NAME
-from settings import CONFIG_FILE
 from func.utils import resource_path
 from ui.ToggleSwitch import ToggleSwitch
-from settings import config, save_settings
 from listen_mattermost import reconnect_websocket
+from func.create_toggle_row import create_toggle_row
+from settings import APP_NAME, CONFIG_FILE, config, save_settings
 
 # --- FINESTRA IMPOSTAZIONI ---
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Impostazioni Mattermost Notifier")
-        self.setFixedSize(450, 420)
+        self.setFixedSize(450, 610)
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
         self.setWindowIcon(QIcon(resource_path(os.path.join("img", "icon_active.png"))))
 
@@ -94,6 +94,38 @@ class SettingsDialog(QDialog):
         h_echo.addWidget(self.chk_echo)
         layout.addLayout(h_echo)
 
+        # Checkbox modalità anonima
+        h_anon = QHBoxLayout()
+        lbl_anon = QLabel("Modalità Anonima (nascondi dettagli):")
+        self.toggle_anon = ToggleSwitch()
+        self.toggle_anon.setChecked(config.get("ANONYMOUS_MODE", False))
+
+        # Colleghiamo il segnale per disabilitare/abilitare i campi sottostanti
+        self.toggle_anon.stateChanged.connect(self.toggle_anonymous_mode)
+
+        h_anon.addWidget(lbl_anon)
+        h_anon.addStretch()
+        h_anon.addWidget(self.toggle_anon)
+        layout.addLayout(h_anon)
+
+        # GroupBox per i campi granulari (attivi se Anonimo è disattivato)
+        self.group_granular = QGroupBox("Campi da includere nelle notifiche:")
+        vbox_granular = QVBoxLayout()
+
+        # Canale, Mittente e Messaggio
+        self.row_channel, self.toggle_channel = create_toggle_row("Includi Canale", "INCLUDE_CHANNEL")
+        self.row_sender, self.toggle_sender = create_toggle_row("Includi Mittente", "INCLUDE_SENDER") 
+        self.row_message, self.toggle_message = create_toggle_row("Includi Contenuto Messaggio", "INCLUDE_MESSAGE")
+        
+        vbox_granular.addWidget(self.row_channel)
+        vbox_granular.addWidget(self.row_sender)
+        vbox_granular.addWidget(self.row_message)
+
+        self.group_granular.setLayout(vbox_granular)
+        layout.addWidget(self.group_granular)
+        self.toggle_anonymous_mode(self.toggle_anon.isChecked())
+
+        # HR
         line = QFrame()
         line.setFrameShape(QFrame.Shape.HLine)
         line.setFrameShadow(QFrame.Shadow.Sunken)
@@ -101,17 +133,21 @@ class SettingsDialog(QDialog):
 
         # Bottone Salva
         self.btn_save = QPushButton("Salva Impostazioni")
-        self.btn_save.setStyleSheet("background-color: #00b4d8; color: #ffffff;")
+        self.btn_save.setStyleSheet("background-color: #00b4d8; color: #f3f3f3;")
         self.btn_save.clicked.connect(self.save)
         layout.addWidget(self.btn_save)
 
         # Pulsante Reset
         self.btn_reset = QPushButton("Ripristina Predefiniti")
-        self.btn_reset.setStyleSheet("background-color: #fc473a; color: #ffffff;")
+        self.btn_reset.setStyleSheet("background-color: #fc473a; color: #f3f3f3;")
         self.btn_reset.clicked.connect(self.reset_settings)
         layout.addWidget(self.btn_reset)
 
         self.setLayout(layout)
+
+    def toggle_anonymous_mode(self, state):
+        is_checked = (state == 2 or state is True)
+        self.group_granular.setEnabled(not is_checked)
 
     def reset_settings(self):
         # Chiediamo conferma prima di resettare
@@ -132,8 +168,12 @@ class SettingsDialog(QDialog):
             self.txt_excluded_senders.clear()
             self.txt_excluded_channels.clear()
             
-            # Riportiamo il toggle echo suppression sullo stato predefinito (True)
+            # Riportiamo i toggle allo stato predefinito
             self.chk_echo.setChecked(True)
+            self.toggle_anon.setChecked(False)
+            self.toggle_sender.setChecked(True)
+            self.toggle_channel.setChecked(True)
+            self.toggle_message.setChecked(True)
             
             # Cancelliamo fisicamente il file di configurazione se esiste
             if os.path.exists(CONFIG_FILE):
@@ -160,7 +200,11 @@ class SettingsDialog(QDialog):
             self.txt_tg_chat_id.text().strip(),
             self.txt_excluded_senders.toPlainText().strip(),
             self.txt_excluded_channels.toPlainText().strip(),
-            self.chk_echo.isChecked()
+            self.chk_echo.isChecked(),
+            self.toggle_anon.isChecked(),
+            self.toggle_sender.isChecked(),
+            self.toggle_channel.isChecked(),
+            self.toggle_message.isChecked()
         )
 
         reconnect_websocket()

@@ -4,9 +4,9 @@ import websockets
 
 from logger import log
 from settings import config
-from datetime import datetime
 from func.message import send_telegram
 from func.fetch_user_id import fetch_user_id
+from func.format_notification import format_notification
 
 # --- STATI APPLICAZIONE ---
 running = True
@@ -78,13 +78,8 @@ async def listen_mattermost():
 
                         # invio messaggio
                         create_at_ms = post_data.get("create_at")
-                        if create_at_ms:
-                            dt = datetime.fromtimestamp(create_at_ms / 1000.0)
-                            formatted_time = dt.strftime("%d/%m/%Y alle %H:%M")
-                        else:
-                            formatted_time = datetime.now().strftime("%d/%m/%Y alle %H:%M")
                                                 
-                        notification_msg = f"*Mattermost Notifier*\n\nData: {formatted_time}\nCanale: {channel_display_name}\nDa: *{sender_name}*\nMessaggio: {message_text}"
+                        notification_msg = format_notification(create_at_ms, channel_display_name, sender_name, message_text)
                         log.debug(notification_msg)
                         
                         if service_active:
