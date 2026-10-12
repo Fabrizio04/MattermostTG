@@ -99,18 +99,18 @@ MattermostTG/
 
 ---
 
-## 📦 Generazione dell'Eseguibile Standalone (`.exe`)
+## 📦 Generazione dell'Eseguibile Standalone
 
 ### 🪟 Windows (.exe)
 
 ```bash
-py -m PyInstaller --noconsole --onefile --add-data "img;img" --icon="img/icon_active.ico" --name="MattermostNotifier-Win" mattermost_notifier.py
+py -m PyInstaller --noconsole --onefile --add-data "img;img" --add-data "aes;aes" --icon="img/icon_active.ico" --name="MattermostNotifier-Win" mattermost_notifier.py
 ```
 
 ### 🐧 Linux (Binary ELF)
 
 ```bash
-pyinstaller --noconsole --onefile --add-data "img:img" --name "MattermostNotifier-Linux" mattermost_notifier.py
+pyinstaller --noconsole --onefile --add-data "img:img" --add-data "aes:aes" --name "MattermostNotifier-Linux" mattermost_notifier.py
 ```
 
 Per una guida dettagliata all'installazione permanente e all'integrazione nel menu di sistema su distribuzioni Linux, consulta la [Guida Linux](doc/LINUX_DEPLOY.md).
@@ -118,7 +118,7 @@ Per una guida dettagliata all'installazione permanente e all'integrazione nel me
 ### 🍏 macOS (Binary Executable)
 
 ```bash
-pyinstaller --noconsole --onefile --add-data "img:img" --name "MattermostNotifier-macOS" mattermost_notifier.py
+pyinstaller --noconsole --onefile --add-data "img:img" --add-data "aes:aes" --name "MattermostNotifier-macOS" mattermost_notifier.py
 ```
 
 Troverai il file eseguibile compilato all'interno della cartella `dist/`.
