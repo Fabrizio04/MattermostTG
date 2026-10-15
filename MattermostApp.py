@@ -68,6 +68,7 @@ class MattermostApp:
 
     def toggle_service(self, checked):
         mattermost_listener.service_active = checked
+        self.action_active.setChecked(checked)
         self.update_icon()
         if self.settings_dialog is not None and self.settings_dialog.isVisible():
             if self.settings_dialog and hasattr(self.settings_dialog, "update_menu_toggle_notification"):
