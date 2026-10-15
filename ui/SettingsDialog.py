@@ -437,6 +437,7 @@ class SettingsDialog(QDialog):
                 pass
 
             reset_settings()
+            mattermost_listener.reconnect_websocket()
 
             self.on_top_window.setChecked(False)
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowStaysOnTopHint)
