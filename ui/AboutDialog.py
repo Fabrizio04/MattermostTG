@@ -13,7 +13,7 @@ class AboutDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Informazioni su Mattermost Notifier")
         self.setFixedSize(380, 260)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint | Qt.WindowType.WindowStaysOnTopHint)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
         self.setWindowIcon(QIcon(resource_path(os.path.join("img", "icon_active.png"))))
 
         layout = QVBoxLayout()

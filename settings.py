@@ -19,7 +19,8 @@ config = {
     "INCLUDE_SENDER": True,
     "INCLUDE_CHANNEL": True,
     "INCLUDE_MESSAGE": True,
-    "AES_ENCRYPTION_ENABLED": False
+    "AES_ENCRYPTION_ENABLED": False,
+    "ALWAYS_ON_TOP": False
 }
 
 # --- CARICAMENTO / SALVATAGGIO SICURO ---
@@ -56,9 +57,10 @@ def reset_settings():
     config["INCLUDE_CHANNEL"] = True
     config["INCLUDE_MESSAGE"] = True
     config["AES_ENCRYPTION_ENABLED"] = False
+    config["ALWAYS_ON_TOP"] = False
 
 
-def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excluded_channels, echo_suppression, anonymous_mode, include_sender, include_channel, include_message, aes_enabled):
+def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excluded_channels, echo_suppression, anonymous_mode, include_sender, include_channel, include_message, aes_enabled, always_on_top):
     global config
     config["MATTERMOST_WS_URL"] = ws_url
     config["TELEGRAM_CHAT_ID"] = tg_chat_id
@@ -72,6 +74,7 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excl
     config["INCLUDE_CHANNEL"] = include_channel
     config["INCLUDE_MESSAGE"] = include_message
     config["AES_ENCRYPTION_ENABLED"] = aes_enabled
+    config["ALWAYS_ON_TOP"] = always_on_top
 
     try:
         with open(CONFIG_FILE, "w", encoding="utf-8") as f:
@@ -85,7 +88,8 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excl
                 "INCLUDE_SENDER": include_sender,
                 "INCLUDE_CHANNEL": include_channel,
                 "INCLUDE_MESSAGE": include_message,
-                "AES_ENCRYPTION_ENABLED": aes_enabled
+                "AES_ENCRYPTION_ENABLED": aes_enabled,
+                "ALWAYS_ON_TOP": always_on_top
             }, f, indent=4)
         log.debug("Impostazioni salvate con successo.")
     except Exception as e:

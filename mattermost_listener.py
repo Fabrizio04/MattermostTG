@@ -5,6 +5,7 @@ import websockets
 from logger import log
 from settings import config
 from func.message import send_telegram
+from ui.WSStatusBridge import ws_bridge
 from func.fetch_user_id import fetch_user_id
 from func.format_notification import format_notification
 
@@ -40,10 +41,12 @@ async def mattermost_listener():
                     "data": {"token": token}
                 }
                 await ws.send(json.dumps(auth_payload))
+
+                log.debug("Autenticazione WebSocket completata.")
+                ws_bridge.status_changed.emit(True)
                 
                 while running:
                     msg = await ws.recv()
-                    log.debug("Autenticazione WebSocket completata.")
                     data = json.loads(msg)
                     
                     if data.get("event") == "posted":
@@ -96,6 +99,7 @@ async def mattermost_listener():
             log.error(f"Errore di connessione verso Mattermost WS: {e}")
         finally:
             current_ws = None
+            ws_bridge.status_changed.emit(False)
             if running:
                 log.debug("Riconnessione tra 5 secondi...")
                 await asyncio.sleep(5)
@@ -115,3 +119,8 @@ def run_websocket_loop():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(mattermost_listener())
+
+
+def is_websocket_connected() -> bool:
+    global current_ws
+    return current_ws is not None
