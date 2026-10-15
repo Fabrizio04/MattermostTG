@@ -28,38 +28,11 @@ class MattermostApp:
         # Menu Contestuale
         self.menu = QMenu()
 
-        # self.tray_ws_action = QAction("Stato WS: Connessione...", self.menu)
-        # self.tray_ws_action.setEnabled(False)
-        # self.action_active.setCheckable(True)
-        # self.menu.addAction(self.tray_ws_action)
-
-        # 1. Creiamo un widget contenitore per la riga del menu
-        tray_ws_widget = QWidget()
-        tray_ws_layout = QHBoxLayout(tray_ws_widget)
-        # Margini simili alle voci di menu standard di Windows
-        tray_ws_layout.setContentsMargins(22, 4, 10, 4) 
-        tray_ws_layout.setSpacing(8)
-
-        # 2. Il nostro pallino (uguale a quello delle impostazioni!)
-        self.tray_ws_dot = QLabel()
-        self.tray_ws_dot.setFixedSize(10, 10)
-        self.tray_ws_dot.setStyleSheet("background-color: #e63946; border-radius: 5px;")
-
-        # 3. L'etichetta del testo
-        self.tray_ws_label = QLabel("Mattermost: Disconnesso")
-
-        tray_ws_layout.addWidget(self.tray_ws_dot)
-        tray_ws_layout.addWidget(self.tray_ws_label)
-        tray_ws_layout.addStretch()
-
-        # 4. Creiamo la QWidgetAction e associamo il widget
-        self.tray_ws_action = QWidgetAction(self.menu)
-        self.tray_ws_action.setDefaultWidget(tray_ws_widget)
-        # Rendiamo l'azione non cliccabile
-        self.tray_ws_action.setEnabled(False)
-
-        # Inseriamo in cima al menu
+        # Creiamo un'azione di sola lettura standard (funziona sia su Windows che su Linux)
+        self.tray_ws_action = QAction("Mattermost: Disconnesso", self.menu)
+        self.tray_ws_action.setEnabled(False)  # Sola lettura / non cliccabile
         self.menu.addAction(self.tray_ws_action)
+        
         self.menu.addSeparator()
         
         self.action_active = QAction("Notifiche Attive", self.menu)
@@ -89,11 +62,9 @@ class MattermostApp:
 
     def update_tray_ws_status(self, is_connected: bool):
         if is_connected:
-            self.tray_ws_dot.setStyleSheet("background-color: #2a9d8f; border-radius: 5px;")
-            self.tray_ws_label.setText("Mattermost: Connesso")
+            self.tray_ws_action.setText("🟢 Mattermost: Connesso")
         else:
-            self.tray_ws_dot.setStyleSheet("background-color: #e63946; border-radius: 5px;")
-            self.tray_ws_label.setText("Mattermost: Disconnesso")
+            self.tray_ws_action.setText("🔴 Mattermost: Disconnesso")
 
     def toggle_service(self, checked):
         mattermost_listener.service_active = checked
