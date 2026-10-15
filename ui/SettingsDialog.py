@@ -462,9 +462,8 @@ class SettingsDialog(QDialog):
             self.on_top_window.isChecked()
         )
 
-        mattermost_listener.reconnect_websocket()
-
         if showMessage == True:
+            mattermost_listener.reconnect_websocket()
             QMessageBox.information(self, "Salvato", "Le impostazioni sono state salvate!")
         
         #self.accept()

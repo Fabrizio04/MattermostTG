@@ -47,8 +47,10 @@ MattermostTG/
     └── mattermosttg.svg        # Immagine vettoriale
 ├── ui/
     ├── AboutDialog.py          # Interfaccia GUI per le informazioni
+    ├── ExcludedListDialog.py   # Interfaccia GUI per le liste di esclusione
     ├── SettingsDialog.py       # Interfaccia GUI per la configurazione
-    └── ToggleSwitch.py         # Componente GUI toggle switch
+    ├── ToggleSwitch.py         # Componente GUI toggle switch
+    └── WSStatusBridge.py       # Componente GUI bridge di comunicazione
 ├── logger.py                   # Sistema di logging centralizzato
 ├── mattermost_listener.py      # Gestione ciclo eventi WebSocket asyncio
 ├── mattermost_notifier.py      # Entry point dell'applicazione
