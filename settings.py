@@ -2,12 +2,21 @@ import os
 import json
 import keyring
 
-from keyring.errors import KeyringError
 from logger import log
+from pathlib import Path
+from keyring.errors import KeyringError
 
 # --- COSTANTI & CONFIGURAZIONE ---
 APP_NAME = "MattermostNotifier"
-CONFIG_FILE = "mattermosttg.json"
+#CONFIG_FILE = "mattermosttg.json"
+
+APP_DIR = Path.home() / ".mattermost_notifier"
+try:
+    APP_DIR.mkdir(parents=True, exist_ok=True)
+except Exception:
+    pass
+
+CONFIG_FILE_PATH = os.path.join(APP_DIR, "mattermosttg.json")
 
 config = {
     "MATTERMOST_WS_URL": "",
@@ -20,15 +29,20 @@ config = {
     "INCLUDE_CHANNEL": True,
     "INCLUDE_MESSAGE": True,
     "AES_ENCRYPTION_ENABLED": False,
-    "ALWAYS_ON_TOP": False
+    "ALWAYS_ON_TOP": False,
+    "WS_RECONNECT_TIMEOUT": 5,
+    "RETRY_LOGIC_TIMEOUT": 10,
+    "RETRY_LOGIC_MAX_ATTEMPTS": 5,
+    "TG_HTTP_TIMEOUT": 5,
+    "LOG_LEVEL": "INFO"
 }
 
 # --- CARICAMENTO / SALVATAGGIO SICURO ---
 def load_settings():
     global config
-    if os.path.exists(CONFIG_FILE):
+    if os.path.exists(CONFIG_FILE_PATH):
         try:
-            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+            with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
                 saved_data = json.load(f)
                 config.update(saved_data)
         except Exception as e:
@@ -58,9 +72,16 @@ def reset_settings():
     config["INCLUDE_MESSAGE"] = True
     config["AES_ENCRYPTION_ENABLED"] = False
     config["ALWAYS_ON_TOP"] = False
+    config["WS_RECONNECT_TIMEOUT"] = 5
+    config["RETRY_LOGIC_TIMEOUT"] = 10
+    config["RETRY_LOGIC_MAX_ATTEMPTS"] = 5
+    config["TG_HTTP_TIMEOUT"] = 5
+    config["LOG_LEVEL"] = "INFO"
+    import logging
+    log.setLevel(logging.INFO)
 
 
-def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excluded_channels, echo_suppression, anonymous_mode, include_sender, include_channel, include_message, aes_enabled, always_on_top):
+def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excluded_channels, echo_suppression, anonymous_mode, include_sender, include_channel, include_message, aes_enabled, always_on_top, ws_val, retry_val, attempts_val, tg_http_val, log_level):
     global config
     config["MATTERMOST_WS_URL"] = ws_url
     config["TELEGRAM_CHAT_ID"] = tg_chat_id
@@ -75,9 +96,14 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excl
     config["INCLUDE_MESSAGE"] = include_message
     config["AES_ENCRYPTION_ENABLED"] = aes_enabled
     config["ALWAYS_ON_TOP"] = always_on_top
+    config["WS_RECONNECT_TIMEOUT"] = ws_val
+    config["RETRY_LOGIC_TIMEOUT"] = retry_val
+    config["RETRY_LOGIC_MAX_ATTEMPTS"] = attempts_val
+    config["TG_HTTP_TIMEOUT"] = tg_http_val
+    config["LOG_LEVEL"] = log_level
 
     try:
-        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+        with open(CONFIG_FILE_PATH, "w", encoding="utf-8") as f:
             json.dump({
                 "MATTERMOST_WS_URL": ws_url,
                 "TELEGRAM_CHAT_ID": tg_chat_id,
@@ -89,7 +115,12 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excl
                 "INCLUDE_CHANNEL": include_channel,
                 "INCLUDE_MESSAGE": include_message,
                 "AES_ENCRYPTION_ENABLED": aes_enabled,
-                "ALWAYS_ON_TOP": always_on_top
+                "ALWAYS_ON_TOP": always_on_top,
+                "WS_RECONNECT_TIMEOUT": ws_val,
+                "RETRY_LOGIC_TIMEOUT": retry_val,
+                "RETRY_LOGIC_MAX_ATTEMPTS": attempts_val,
+                "TG_HTTP_TIMEOUT": tg_http_val,
+                "LOG_LEVEL": log_level
             }, f, indent=4)
         log.debug("Impostazioni salvate con successo.")
     except Exception as e:

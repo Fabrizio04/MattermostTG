@@ -1,6 +1,6 @@
 import os
 from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QLabel, 
+    QDialog, QVBoxLayout, QLabel, QHBoxLayout,
     QTextEdit, QPushButton, QMessageBox
 )
 from PyQt6.QtCore import Qt
@@ -38,19 +38,26 @@ class ExcludedListDialog(QDialog):
         self.text_area.setText(config.get(self.config_key, ""))
         layout.addWidget(self.text_area)
 
-        # Bottone Salva
-        self.btn_save = QPushButton("Salva Modifiche")
-        self.btn_save.setStyleSheet("background-color: #00b4d8; color: #f3f3f3; padding: 8px; font-weight: bold;")
+        # Pulsanti Salva / Annulla
+        btn_layout = QHBoxLayout()
+        btn_layout.addStretch()
+
+        self.btn_cancel = QPushButton("Annulla")
+        self.btn_cancel.clicked.connect(self.reject)
+        btn_layout.addWidget(self.btn_cancel)
+
+        self.btn_save = QPushButton("Salva")
+        self.btn_save.setStyleSheet("background-color: #007acc; color: white; font-weight: bold;")
         self.btn_save.clicked.connect(self.save_list)
-        layout.addWidget(self.btn_save)
+        btn_layout.addWidget(self.btn_save)
+
+        layout.addLayout(btn_layout)
 
         self.setLayout(layout)
 
     def save_list(self):
         content = self.text_area.toPlainText().strip()
         
-        # Aggiorniamo la configurazione preservando gli altri valori correnti
-        # Leggiamo i valori attuali da config per non sovrascrivere tutto con stringhe vuote
         save_settings(
             config.get("MATTERMOST_WS_URL", ""),
             config.get("MATTERMOST_TOKEN", ""),
@@ -64,7 +71,12 @@ class ExcludedListDialog(QDialog):
             config.get("INCLUDE_CHANNEL", True),
             config.get("INCLUDE_MESSAGE", True),
             config.get("AES_ENCRYPTION_ENABLED", False),
-            config.get("ALWAYS_ON_TOP", False)
+            config.get("ALWAYS_ON_TOP", False),
+            config.get("WS_RECONNECT_TIMEOUT", 5),
+            config.get("RETRY_LOGIC_TIMEOUT", 10),
+            config.get("RETRY_LOGIC_MAX_ATTEMPTS", 5),
+            config.get("TG_HTTP_TIMEOUT", 5),
+            config.get("LOG_LEVEL", "INFO")
         )
         
         QMessageBox.information(self, "Salvato", "La lista è stata aggiornata con successo!")

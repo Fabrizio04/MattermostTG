@@ -25,7 +25,7 @@ async def mattermost_listener():
         token = config.get("MATTERMOST_TOKEN")
 
         if not ws_url or not token:
-            await asyncio.sleep(3)
+            await asyncio.sleep(int(config.get("WS_RECONNECT_TIMEOUT", 5)))
             continue
 
         user_id = fetch_user_id(ws_url, token)
@@ -101,8 +101,8 @@ async def mattermost_listener():
             current_ws = None
             ws_bridge.status_changed.emit(False)
             if running:
-                log.debug("Riconnessione tra 5 secondi...")
-                await asyncio.sleep(5)
+                log.debug(f"Riconnessione tra {config.get("WS_RECONNECT_TIMEOUT", 5)} secondi...")
+                await asyncio.sleep(int(config.get("WS_RECONNECT_TIMEOUT", 5)))
 
 def reconnect_websocket():
     """

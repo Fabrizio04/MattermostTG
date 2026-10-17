@@ -12,6 +12,7 @@ from PyQt6.QtGui import QAction
 from ui.WSStatusBridge import ws_bridge
 from ui.SettingsDialog import SettingsDialog
 from func.utils import make_circle_icon, get_tray_icon
+from func.message_queue import start_retry_worker, stop_retry_worker
 
 # --- APPLICATION CONTROLLER ---
 class MattermostApp:
@@ -56,6 +57,7 @@ class MattermostApp:
 
         # Avvio WebSocket
         threading.Thread(target=mattermost_listener.run_websocket_loop, daemon=True).start()
+        start_retry_worker()
 
         ws_bridge.status_changed.connect(self.update_tray_ws_status)
         self.update_tray_ws_status(mattermost_listener.is_websocket_connected())
@@ -102,6 +104,7 @@ class MattermostApp:
 
     def quit(self):
         mattermost_listener.running = False
+        stop_retry_worker()
         self.tray_icon.hide()
         self.qapp.quit()
         log.info("Servizio terminato")

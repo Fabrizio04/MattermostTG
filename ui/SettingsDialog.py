@@ -16,15 +16,18 @@ from PyQt6.QtGui import QIcon, QAction
 from ui.AboutDialog import AboutDialog
 from ui.WSStatusBridge import ws_bridge
 from func.aes import get_or_create_aes_key
+from ui.LogViewerDialog import LogViewerDialog
 from func.create_toggle_row import create_toggle_row
 from ui.ExcludedListDialog import ExcludedListDialog
-from settings import APP_NAME, CONFIG_FILE, config, save_settings, reset_settings
+from ui.TimeoutSettingsDialog import TimeoutSettingsDialog
+from settings import APP_NAME, CONFIG_FILE_PATH, config, save_settings, reset_settings
 
 # --- FINESTRA IMPOSTAZIONI ---
 class SettingsDialog(QDialog):
     def __init__(self, controller=None, parent=None):
         super().__init__(parent)
         self.controller = controller
+        self.log_dialog = None # Nel controller / __init__
 
         self.setWindowTitle("Impostazioni Mattermost Notifier")
         self.setFixedSize(450, 470)
@@ -112,16 +115,12 @@ class SettingsDialog(QDialog):
         # --- MENU AVANZATE ---
         menu_advanced = self.menu_bar.addMenu("Avanzate")
         
-        act_timeout_listener = QAction("Impostazione timeout listener", self)
-        menu_advanced.addAction(act_timeout_listener)
-        
-        act_timeout_retry = QAction("Impostazione timeout retry logic", self)
-        menu_advanced.addAction(act_timeout_retry)
-        
-        act_debug = QAction("Impostazione livello debug", self)
-        menu_advanced.addAction(act_debug)
+        act_timeout = QAction("Impostazioni timeout", self)
+        act_timeout.triggered.connect(self.open_timeout_settings)
+        menu_advanced.addAction(act_timeout)
         
         act_logs = QAction("Log applicazione", self)
+        act_logs.triggered.connect(self.open_log)
         menu_advanced.addAction(act_logs)
 
         # --- MENU AES-256 ---
@@ -277,8 +276,8 @@ class SettingsDialog(QDialog):
         file_path, _ = QFileDialog.getSaveFileName(self, "Esporta Impostazioni", "mattermosttg_settings.json", "JSON Files (*.json)")
         if file_path:
             try:
-                if os.path.exists(CONFIG_FILE):
-                    shutil.copy(CONFIG_FILE, file_path)
+                if os.path.exists(CONFIG_FILE_PATH):
+                    shutil.copy(CONFIG_FILE_PATH, file_path)
                     QMessageBox.information(self, "Esportazione", "Impostazioni esportate con successo!")
                 else:
                     QMessageBox.warning(self, "Attenzione", "File di configurazione non trovato.")
@@ -289,7 +288,7 @@ class SettingsDialog(QDialog):
         file_path, _ = QFileDialog.getOpenFileName(self, "Importa Impostazioni", "", "JSON Files (*.json)")
         if file_path:
             try:
-                shutil.copy(file_path, CONFIG_FILE)
+                shutil.copy(file_path, CONFIG_FILE_PATH)
                 from settings import load_settings # O ricarica config
                 load_settings()
                 #ricaricare la UI...
@@ -384,6 +383,21 @@ class SettingsDialog(QDialog):
         dialog = ExcludedListDialog(list_type, self)
         dialog.exec()
 
+    def open_timeout_settings(self):
+        dialog = TimeoutSettingsDialog(self)
+        dialog.exec()
+
+    def open_log(self):
+        if self.log_dialog is not None and self.log_dialog.isVisible():
+            self.log_dialog.activateWindow()
+            self.log_dialog.raise_()
+            return
+
+        self.log_dialog = LogViewerDialog(parent=self)
+        self.log_dialog.show() # Usiamo show() per mantenerla non modale e indipendente!
+        self.log_dialog.raise_()
+        self.log_dialog.activateWindow()
+
     def open_about(self):
         about_dialog = AboutDialog(self)
         about_dialog.exec()
@@ -414,9 +428,9 @@ class SettingsDialog(QDialog):
             self.toggle_aes.setChecked(False)
             
             # Cancelliamo fisicamente il file di configurazione se esiste
-            if os.path.exists(CONFIG_FILE):
+            if os.path.exists(CONFIG_FILE_PATH):
                 try:
-                    os.remove(CONFIG_FILE)
+                    os.remove(CONFIG_FILE_PATH)
                 except Exception as e:
                     print(f"Errore rimozione file config: {e}")
             
@@ -460,7 +474,12 @@ class SettingsDialog(QDialog):
             self.toggle_channel.isChecked(),
             self.toggle_message.isChecked(),
             self.toggle_aes.isChecked(),
-            self.on_top_window.isChecked()
+            self.on_top_window.isChecked(),
+            config.get("WS_RECONNECT_TIMEOUT", 5),
+            config.get("RETRY_LOGIC_TIMEOUT", 10),
+            config.get("RETRY_LOGIC_MAX_ATTEMPTS", 5),
+            config.get("TG_HTTP_TIMEOUT", 5),
+            config.get("LOG_LEVEL", "INFO")
         )
 
         if showMessage == True:
@@ -487,4 +506,6 @@ class SettingsDialog(QDialog):
 
     def closeEvent(self, event):
         event.accept()
+        if self.log_dialog is not None and self.log_dialog.isVisible():
+            self.log_dialog.close()
         super().closeEvent(event)
