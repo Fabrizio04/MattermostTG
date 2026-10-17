@@ -6,6 +6,7 @@ Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed e
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![PyQt6](https://img.shields.io/badge/GUI-PyQt6-green.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
+![Build](https://github.com/Fabrizio04/MattermostTG/actions/workflows/build.yml/badge.svg)
 
 ---
 
@@ -29,33 +30,35 @@ Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed e
 ```
 MattermostTG/
 ├── aes/
-    └── decrypter.html          # Webapp per decifrazione AES-256
+    └── decrypter.html             # Webapp per decifrazione AES-256
 ├── func/
-    ├── aes.py                  # Gestione crittografia AES-256
-    ├── create_toggle_row.py    # Funzione per creazione toggle row
-    ├── fetch_user_id.py        # Funzione per salvataggio id utente
-    ├── format_notification.py  # Funzione per formattazione notifica
-    ├── message.py              # Invio chiamate API verso Telegram
-    ├── parse_arguments.py      # Funzione per gestione argomenti
-    └── utils.py                # Gestione percorsi risorse e icone
+    ├── aes.py                     # Gestione crittografia AES-256
+    ├── create_toggle_row.py       # Funzione per creazione toggle row
+    ├── fetch_user_id.py           # Funzione per salvataggio id utente
+    ├── format_notification.py     # Funzione per formattazione notifica
+    ├── message_queue.py           # Gestione retry e coda di invio
+    ├── message.py                 # Invio chiamate API verso Telegram
+    └── utils.py                   # Gestione percorsi risorse e icone
 ├── img/
-    ├── icon_active.ico         # Icona per Windows (Attiva)
-    ├── icon_inactive.ico       # Icona per Windows (Inattiva)
-    ├── icon_active.png         # Icona per Linux / macOS (Attiva)
-    ├── icon_inactive.png       # Icona per Linux / macOS (Inattiva)
-    ├── mattermosttg.af         # Progetto affinity
-    └── mattermosttg.svg        # Immagine vettoriale
+    ├── icon_active.ico            # Icona per Windows (Attiva)
+    ├── icon_inactive.ico          # Icona per Windows (Inattiva)
+    ├── icon_active.png            # Icona per Linux / macOS (Attiva)
+    ├── icon_inactive.png          # Icona per Linux / macOS (Inattiva)
+    ├── mattermosttg.af            # Progetto affinity
+    └── mattermosttg.svg           # Immagine vettoriale
 ├── ui/
-    ├── AboutDialog.py          # Interfaccia GUI per le informazioni
-    ├── ExcludedListDialog.py   # Interfaccia GUI per le liste di esclusione
-    ├── SettingsDialog.py       # Interfaccia GUI per la configurazione
-    ├── ToggleSwitch.py         # Componente GUI toggle switch
-    └── WSStatusBridge.py       # Componente GUI bridge di comunicazione
-├── logger.py                   # Sistema di logging centralizzato
-├── mattermost_listener.py      # Gestione ciclo eventi WebSocket asyncio
-├── mattermost_notifier.py      # Entry point dell'applicazione
-├── MattermostApp.py            # Gestione System Tray e menu contestuale
-└── settings.py                 # Lettura/scrittura configurazioni e keyring
+    ├── AboutDialog.py             # Interfaccia GUI per le informazioni
+    ├── ExcludedListDialog.py      # Interfaccia GUI per le liste di esclusione
+    ├── LogViewerDialog.py         # Interfaccia GUI per i log dell'applicazione
+    ├── SettingsDialog.py          # Interfaccia GUI per la configurazione
+    ├── TimeoutSettingsDialog.py   # Interfaccia GUI per i parametri timeout
+    ├── ToggleSwitch.py            # Componente GUI toggle switch
+    └── WSStatusBridge.py          # Componente GUI bridge di comunicazione
+├── logger.py                      # Sistema di logging centralizzato
+├── mattermost_listener.py         # Gestione ciclo eventi WebSocket asyncio
+├── mattermost_notifier.py         # Entry point dell'applicazione
+├── MattermostApp.py               # Gestione System Tray e menu contestuale
+└── settings.py                    # Lettura/scrittura configurazioni e keyring
 ```
 
 ---
