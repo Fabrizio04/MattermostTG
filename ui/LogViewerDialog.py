@@ -159,8 +159,6 @@ class LogViewerDialog(QDialog):
 
     def on_log_level_changed(self, new_level: str):
         """Cambia il livello di logging al volo sia in memoria che su config."""
-        # config.set("LOG_LEVEL", new_level)
-        # config.save()
         
         # Imposta il nuovo livello nel logger
         import logging

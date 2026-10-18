@@ -7,6 +7,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from func.utils import resource_path
 from settings import config, save_settings
+from func.check_on_close import check_on_close
 
 class ExcludedListDialog(QDialog):
     def __init__(self, list_type: str, parent=None):
@@ -43,19 +44,19 @@ class ExcludedListDialog(QDialog):
         btn_layout.addStretch()
 
         self.btn_cancel = QPushButton("Annulla")
-        self.btn_cancel.clicked.connect(self.reject)
+        self.btn_cancel.clicked.connect(self.close)
         btn_layout.addWidget(self.btn_cancel)
 
         self.btn_save = QPushButton("Salva")
         self.btn_save.setStyleSheet("background-color: #007acc; color: white; font-weight: bold;")
-        self.btn_save.clicked.connect(self.save_list)
+        self.btn_save.clicked.connect(lambda: self.save_list())
         btn_layout.addWidget(self.btn_save)
 
         layout.addLayout(btn_layout)
 
         self.setLayout(layout)
 
-    def save_list(self):
+    def save_list(self, showMessage=True):
         content = self.text_area.toPlainText().strip()
         
         save_settings(
@@ -78,6 +79,32 @@ class ExcludedListDialog(QDialog):
             config.get("TG_HTTP_TIMEOUT", 5),
             config.get("LOG_LEVEL", "INFO")
         )
-        
-        QMessageBox.information(self, "Salvato", "La lista è stata aggiornata con successo!")
+
+        if showMessage == True:
+            QMessageBox.information(self, "Salvato", "La lista è stata aggiornata con successo!")
+
         self.accept()
+
+    def closeEvent(self, event):
+
+        current_values = {
+            self.config_key: self.text_area.toPlainText().strip()
+        }
+
+        can_close = check_on_close(
+            parent_window=self, 
+            current_values=current_values, 
+            save_callback=lambda: self.save_list(False)
+        )
+
+        if can_close:
+            event.accept()
+        else:
+            event.ignore()
+
+    def reject(self):
+        """
+        Intercetta la chiusura tramite il tasto ESC (o chiamate di reject) 
+        e la dirotta sul closeEvent per attivare il controllo delle modifiche.
+        """
+        self.close()

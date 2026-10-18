@@ -8,7 +8,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from func.utils import resource_path
 from settings import config, save_settings
-from logger import log
+from func.check_on_close import check_on_close
 
 class TimeoutSettingsDialog(QDialog):
     def __init__(self, parent=None):
@@ -65,12 +65,12 @@ class TimeoutSettingsDialog(QDialog):
 
         self.btn_save = QPushButton("Salva")
         self.btn_save.setStyleSheet("background-color: #007acc; color: white; font-weight: bold;")
-        self.btn_save.clicked.connect(self.save_settings)
+        self.btn_save.clicked.connect(lambda: self.save_settings())
         btn_layout.addWidget(self.btn_save)
 
         layout.addLayout(btn_layout)
 
-    def save_settings(self):
+    def save_settings(self, showMessage=True):
         ws_val = self.ws_timeout_spin.value()
         retry_val = self.retry_timeout_spin.value()
         attempts_val = self.max_attempts_spin.value()
@@ -96,6 +96,35 @@ class TimeoutSettingsDialog(QDialog):
             tg_http_val,
             config.get("LOG_LEVEL", "INFO")
         )
-        
-        QMessageBox.information(self, "Salvato", "La lista è stata aggiornata con successo!")
+
+        if showMessage == True:
+            QMessageBox.information(self, "Salvato", "La lista è stata aggiornata con successo!")
+
         self.accept()
+
+    def closeEvent(self, event):
+    
+        current_values = {
+            "WS_RECONNECT_TIMEOUT": self.ws_timeout_spin.value(),
+            "RETRY_LOGIC_TIMEOUT": self.retry_timeout_spin.value(),
+            "RETRY_LOGIC_MAX_ATTEMPTS": self.max_attempts_spin.value(),
+            "TG_HTTP_TIMEOUT": self.timeout_http_tg.value(),
+        }
+
+        can_close = check_on_close(
+            parent_window=self, 
+            current_values=current_values, 
+            save_callback=lambda: self.save_settings(False)
+        )
+
+        if can_close:
+            event.accept()
+        else:
+            event.ignore()
+
+    def reject(self):
+        """
+        Intercetta la chiusura tramite il tasto ESC (o chiamate di reject) 
+        e la dirotta sul closeEvent per attivare il controllo delle modifiche.
+        """
+        self.close()

@@ -16,6 +16,7 @@ from PyQt6.QtGui import QIcon, QAction
 from ui.AboutDialog import AboutDialog
 from ui.WSStatusBridge import ws_bridge
 from func.aes import get_or_create_aes_key
+from func.check_on_close import check_on_close
 from ui.LogViewerDialog import LogViewerDialog
 from func.create_toggle_row import create_toggle_row
 from ui.ExcludedListDialog import ExcludedListDialog
@@ -505,7 +506,36 @@ class SettingsDialog(QDialog):
             self.ws_indicator.setToolTip("Stato WebSocket: Disconnesso")
 
     def closeEvent(self, event):
-        event.accept()
-        if self.log_dialog is not None and self.log_dialog.isVisible():
-            self.log_dialog.close()
-        super().closeEvent(event)
+
+        current_values = {
+            "MATTERMOST_WS_URL": self.txt_ws_url.text().strip(),
+            "MATTERMOST_TOKEN": self.txt_mm_token.text().strip(),
+            "TELEGRAM_CHAT_ID": self.txt_tg_chat_id.text().strip(),
+            "TELEGRAM_BOT_TOKEN": self.txt_tg_token.text().strip(),
+            "ECHO_SUPPRESSION_ENABLED": self.chk_echo.isChecked(),
+            "ANONYMOUS_MODE": self.toggle_anon.isChecked(),
+            "INCLUDE_SENDER": self.toggle_sender.isChecked(),
+            "INCLUDE_CHANNEL": self.toggle_channel.isChecked(),
+            "INCLUDE_MESSAGE": self.toggle_message.isChecked(),
+            "AES_ENCRYPTION_ENABLED": self.toggle_aes.isChecked()
+        }
+
+        can_close = check_on_close(
+            parent_window=self, 
+            current_values=current_values, 
+            save_callback=lambda: self.save(False)  # Il metodo che salva già i dati nella finestra
+        )
+
+        if can_close:
+            if self.log_dialog is not None and self.log_dialog.isVisible():
+                self.log_dialog.close()
+            event.accept()
+        else:
+            event.ignore()
+
+    def reject(self):
+            """
+            Intercetta la chiusura tramite il tasto ESC (o chiamate di reject) 
+            e la dirotta sul closeEvent per attivare il controllo delle modifiche.
+            """
+            self.close()

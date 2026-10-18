@@ -96,7 +96,7 @@ async def mattermost_listener():
         #except websockets.exceptions.ConnectionClosed:
             #log.debug("Connessione WebSocket chiusa.")
         except Exception as e:
-            log.error(f"Errore di connessione verso Mattermost WS: {e}")
+            log.error(f"Errore di connessione Mattermost WS: {e}")
         finally:
             current_ws = None
             ws_bridge.status_changed.emit(False)

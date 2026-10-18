@@ -1,5 +1,6 @@
 import os
 import sys
+import signal
 
 # Compatibilità Linux/GNOME: previene il crash di GLib-GIO e i problemi con il display manager
 if sys.platform.startswith("linux"):
@@ -10,7 +11,7 @@ if sys.platform.startswith("linux"):
 from settings import load_settings
 from MattermostApp import MattermostApp
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtCore import QLockFile, QDir
+from PyQt6.QtCore import QLockFile, QDir, QTimer
 from PyQt6.QtWidgets import QApplication, QMessageBox
 
 from logger import log
@@ -40,6 +41,27 @@ def main():
     app.setQuitOnLastWindowClosed(False)
     notifier = MattermostApp(app)
     log.info("Servizio avviato")
+
+    # Funzione di spegnimento pulito
+    def shutdown_gracefully():
+        log.info("Chiusura in corso...")
+        if hasattr(notifier, 'quit'):
+            notifier.quit()
+        app.quit()
+
+    # Intercettiamo il Ctrl+C (SIGINT)
+    def sigint_handler(signum, frame):
+        shutdown_gracefully()
+
+    signal.signal(signal.SIGINT, sigint_handler)
+
+    # Timer periodico che permette a Python di intercettare i segnali 
+    # della tastiera anche durante l'esecuzione di app.exec()
+    timer = QTimer()
+    timer.timeout.connect(lambda: None)
+    timer.start(500)
+
+    # Avvio pulito
     sys.exit(app.exec())
 
 if __name__ == "__main__":

@@ -8,7 +8,6 @@ from keyring.errors import KeyringError
 
 # --- COSTANTI & CONFIGURAZIONE ---
 APP_NAME = "MattermostNotifier"
-#CONFIG_FILE = "mattermosttg.json"
 
 APP_DIR = Path.home() / ".mattermost_notifier"
 try:

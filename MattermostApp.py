@@ -1,16 +1,11 @@
-# import os
 import threading
 import mattermost_listener
-
-from PyQt6.QtWidgets import (
-    QSystemTrayIcon, QMenu, QLabel,
-    QWidget, QHBoxLayout, QWidgetAction
-)
 
 from logger import log
 from PyQt6.QtGui import QAction
 from ui.WSStatusBridge import ws_bridge
 from ui.SettingsDialog import SettingsDialog
+from PyQt6.QtWidgets import QSystemTrayIcon, QMenu
 from func.utils import make_circle_icon, get_tray_icon
 from func.message_queue import start_retry_worker, stop_retry_worker
 
@@ -18,7 +13,7 @@ from func.message_queue import start_retry_worker, stop_retry_worker
 class MattermostApp:
     def __init__(self, qapp):
         self.qapp = qapp
-        self.settings_dialog = None  # Per evitare aperture doppie
+        self.settings_dialog = None
 
         # Tray Icon
         self.tray_icon = QSystemTrayIcon()
@@ -31,7 +26,7 @@ class MattermostApp:
 
         # Creiamo un'azione di sola lettura standard (funziona sia su Windows che su Linux)
         self.tray_ws_action = QAction("Mattermost: Disconnesso", self.menu)
-        self.tray_ws_action.setEnabled(False)  # Sola lettura / non cliccabile
+        self.tray_ws_action.setEnabled(False)
         self.menu.addAction(self.tray_ws_action)
         
         self.menu.addSeparator()
@@ -97,8 +92,6 @@ class MattermostApp:
             return
 
         self.settings_dialog = SettingsDialog(controller=self)
-        # self.settings_dialog.exec()
-        # self.settings_dialog = None
         self.settings_dialog.finished.connect(lambda: setattr(self, 'settings_dialog', None))
         self.settings_dialog.show()
 
