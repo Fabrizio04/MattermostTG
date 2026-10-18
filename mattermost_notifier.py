@@ -8,13 +8,15 @@ if sys.platform.startswith("linux"):
     os.environ.setdefault("QT_STYLE_OVERRIDE", "Fusion")
     os.environ.setdefault("GSETTINGS_BACKEND", "memory")
 
-from settings import load_settings
+from logger import log
+from settings import load_settings, config
+from func.theme import get_stylesheet
 from MattermostApp import MattermostApp
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QLockFile, QDir, QTimer
 from PyQt6.QtWidgets import QApplication, QMessageBox
 
-from logger import log
+from ui.CustomMessageBox import CustomMessageBox
 
 # Manteniamo il lock file a livello globale per evitare che il Garbage Collector lo elimini
 lock_file = None
@@ -22,6 +24,9 @@ lock_file = None
 def main():
     global lock_file
     app = QApplication(sys.argv)
+    load_settings()
+    app.setStyleSheet(get_stylesheet(config.get("THEME", "light")))
+    # app.setStyle("Fusion")
 
     # Crea un file di lock nella cartella temporanea del sistema
     lock_path = os.path.join(QDir.tempPath(), "MattermostNotifier.lock")
@@ -30,14 +35,15 @@ def main():
     # Tenta di acquisire il lock senza attendere (tryLock con timeout 0)
     if not lock_file.tryLock(100):
         # Se il lock fallisce, l'app è già in esecuzione
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Icon.Warning)
-        msg.setWindowTitle("Applicazione già in esecuzione")
-        msg.setText("Mattermost Notifier è già attivo nella tray area del sistema in uso.")
-        msg.exec()
+        # msg = QMessageBox()
+        # msg.setIcon(QMessageBox.Icon.Warning)
+        # msg.setWindowTitle("Applicazione già in esecuzione")
+        # msg.setText("Mattermost Notifier è già attivo nella tray area del sistema in uso.")
+        # msg.exec()
+        CustomMessageBox.show_warning_on_start("Applicazione già in esecuzione", "Mattermost Notifier è già attivo nella tray area del sistema in uso.")
         sys.exit(0)
 
-    load_settings()
+    
     app.setQuitOnLastWindowClosed(False)
     notifier = MattermostApp(app)
     log.info("Servizio avviato")

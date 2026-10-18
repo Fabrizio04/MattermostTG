@@ -1,19 +1,38 @@
 import os
 from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
+    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QWidget,
     QComboBox, QPushButton, QTextEdit, QMessageBox
 )
-from PyQt6.QtCore import QTimer
+
+from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve
 from func.utils import resource_path
 from logger import log, LOG_FILE_PATH
 from settings import config, save_settings
 from PyQt6.QtGui import QFont, QGuiApplication, QIcon
+from ui.CustomTitleBar import CustomTitleBar
+from ui.CustomMessageBox import CustomMessageBox
 
 class LogViewerDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)  # Passiamo il parent per ereditare i livelli z-index/primo piano
-        self.setWindowTitle("Log Applicazione - Mattermost Notifier")
+        #self.setWindowTitle("Log Applicazione - Mattermost Notifier")
         self.resize(850, 470)
+        ###
+        # --- EFFETTO FADE-IN (COMPARSA SFUMATA) ---
+        self.setWindowOpacity(0.0) # Parte completamente trasparente
+        
+        self.fade_animation = QPropertyAnimation(self, b"windowOpacity")
+        self.fade_animation.setDuration(200) # Durata in millisecondi (es. 0.2 secondi)
+        self.fade_animation.setStartValue(0.0)
+        self.fade_animation.setEndValue(1.0)
+        self.fade_animation.setEasingCurve(QEasingCurve.Type.InOutQuad)
+        
+        # Avvia l'animazione appena la finestra viene creata
+        self.fade_animation.start()
+        ###
+
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Dialog)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self.setWindowIcon(QIcon(resource_path(os.path.join("img", "icon_active.png"))))
         
         self.last_file_pos = 0  # Per leggere solo le novità nel file di log
@@ -41,12 +60,27 @@ class LogViewerDialog(QDialog):
 
             self.move(new_x, new_y)
 
-        layout = QVBoxLayout(self)
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+
+        container = QWidget(self)
+        container.setObjectName("MainContainer")
+        container_layout = QVBoxLayout(container)
+        container_layout.setContentsMargins(0, 0, 0, 0)
+        container_layout.setSpacing(0)
+
+        self.title_bar = CustomTitleBar(self, title="Log Applicazione - Mattermost Notifier")
+        container_layout.addWidget(self.title_bar)
+
+        layout = QVBoxLayout()
+        layout.setContentsMargins(15, 12, 15, 15) # Left, Top, Right, Bottom
+        layout.setSpacing(10) # Spazio verticale costante tra i blocchi
 
         # --- BARRA SUPERIORE CONTROLLI ---
         top_layout = QHBoxLayout()
 
-        top_layout.addWidget(QLabel("Livello Debug:"))
+        top_layout.addWidget(QLabel("Livello Logging:"))
 
         self.combo_level = QComboBox()
         self.combo_level.addItems(["DEBUG", "INFO", "WARNING", "ERROR"])
@@ -84,6 +118,10 @@ class LogViewerDialog(QDialog):
         self.timer.setInterval(1000)  # Controlla aggiornamenti ogni secondo
         self.timer.timeout.connect(self.read_new_logs)
         self.timer.start()
+
+        container_layout.addLayout(layout)
+        main_layout.addWidget(container)
+        self.setLayout(main_layout)
 
         # Prima lettura completa all'apertura
         self.load_full_log()
@@ -188,20 +226,22 @@ class LogViewerDialog(QDialog):
                 config.get("RETRY_LOGIC_TIMEOUT", 10),
                 config.get("RETRY_LOGIC_MAX_ATTEMPTS", 5),
                 config.get("TG_HTTP_TIMEOUT", 5),
-                new_level
+                new_level,
+                config.get("THEME", "light")
             )
 
     def clear_log_file(self):
         """Chiede conferma e svuota il file di log."""
-        reply = QMessageBox.question(
-            self,
-            "Conferma Pulizia",
-            "Sei sicuro di voler cancellare l'intero contenuto del file di log?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No
-        )
+        # reply = QMessageBox.question(
+        #     self,
+        #     "Conferma Pulizia",
+        #     "Sei sicuro di voler cancellare l'intero contenuto del file di log?",
+        #     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        #     QMessageBox.StandardButton.No
+        # )
+        reply = CustomMessageBox.ask_yes_no(self, "Conferma Pulizia", "Sei sicuro di voler cancellare l'intero contenuto del file di log?")
 
-        if reply == QMessageBox.StandardButton.Yes:
+        if reply == "yes":
             try:
                 with open(LOG_FILE_PATH, "w", encoding="utf-8") as f:
                     f.write("")
@@ -209,7 +249,8 @@ class LogViewerDialog(QDialog):
                 self.last_file_pos = 0
                 log.info("File di log svuotato dall'utente.")
             except Exception as e:
-                QMessageBox.critical(self, "Errore", f"Impossibile svuotare il log: {e}")
+                CustomMessageBox.show_critical(self, "Errore", f"Impossibile svuotare il log: {e}")
+                # QMessageBox.critical(self, "Errore", f"Impossibile svuotare il log: {e}")
 
     def closeEvent(self, event):
         """Ferma il timer quando la finestra viene chiusa."""

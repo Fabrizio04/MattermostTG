@@ -1,6 +1,8 @@
 from settings import config
 from PyQt6.QtWidgets import QMessageBox
 
+from ui.CustomMessageBox import CustomMessageBox
+
 def check_on_close(parent_window, current_values: dict, save_callback) -> bool:
     """
     Confronta i valori correnti della UI con quelli salvati in config.
@@ -18,18 +20,24 @@ def check_on_close(parent_window, current_values: dict, save_callback) -> bool:
             break
             
     if has_changes:
-        reply = QMessageBox.question(
+        # reply = QMessageBox.question(
+        #     parent_window,
+        #     "Modifiche non salvate",
+        #     "Hai modificato alcune impostazioni senza salvarle.\nVuoi salvare le modifiche prima di chiudere?",
+        #     QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Cancel,
+        #     QMessageBox.StandardButton.Save
+        # )
+
+        reply = CustomMessageBox.ask_save_changes(
             parent_window,
             "Modifiche non salvate",
-            "Hai modificato alcune impostazioni senza salvarle.\nVuoi salvare le modifiche prima di chiudere?",
-            QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Cancel,
-            QMessageBox.StandardButton.Save
+            "Hai modificato alcune impostazioni senza salvarle.\nVuoi salvare le modifiche prima di chiudere?"
         )
         
-        if reply == QMessageBox.StandardButton.Save:
+        if reply == "save":
             save_callback()  # Esegue la funzione di salvataggio della specifica finestra
             return True
-        elif reply == QMessageBox.StandardButton.Discard:
+        elif reply == "discard":
             return True      # Chiude senza salvare
         else:
             return False     # Annulla la chiusura e resta nella finestra

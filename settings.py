@@ -33,7 +33,8 @@ config = {
     "RETRY_LOGIC_TIMEOUT": 10,
     "RETRY_LOGIC_MAX_ATTEMPTS": 5,
     "TG_HTTP_TIMEOUT": 5,
-    "LOG_LEVEL": "INFO"
+    "LOG_LEVEL": "INFO",
+    "THEME": "light"
 }
 
 # --- CARICAMENTO / SALVATAGGIO SICURO ---
@@ -78,9 +79,10 @@ def reset_settings():
     config["LOG_LEVEL"] = "INFO"
     import logging
     log.setLevel(logging.INFO)
+    config["THEME"] = "light"
 
 
-def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excluded_channels, echo_suppression, anonymous_mode, include_sender, include_channel, include_message, aes_enabled, always_on_top, ws_val, retry_val, attempts_val, tg_http_val, log_level):
+def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excluded_channels, echo_suppression, anonymous_mode, include_sender, include_channel, include_message, aes_enabled, always_on_top, ws_val, retry_val, attempts_val, tg_http_val, log_level, theme):
     global config
     config["MATTERMOST_WS_URL"] = ws_url
     config["TELEGRAM_CHAT_ID"] = tg_chat_id
@@ -100,6 +102,7 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excl
     config["RETRY_LOGIC_MAX_ATTEMPTS"] = attempts_val
     config["TG_HTTP_TIMEOUT"] = tg_http_val
     config["LOG_LEVEL"] = log_level
+    config["THEME"] = theme
 
     try:
         with open(CONFIG_FILE_PATH, "w", encoding="utf-8") as f:
@@ -119,7 +122,8 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excl
                 "RETRY_LOGIC_TIMEOUT": retry_val,
                 "RETRY_LOGIC_MAX_ATTEMPTS": attempts_val,
                 "TG_HTTP_TIMEOUT": tg_http_val,
-                "LOG_LEVEL": log_level
+                "LOG_LEVEL": log_level,
+                "THEME": theme
             }, f, indent=4)
         log.debug("Impostazioni salvate con successo.")
     except Exception as e:

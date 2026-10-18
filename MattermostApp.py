@@ -9,6 +9,9 @@ from PyQt6.QtWidgets import QSystemTrayIcon, QMenu
 from func.utils import make_circle_icon, get_tray_icon
 from func.message_queue import start_retry_worker, stop_retry_worker
 
+from settings import config
+from func.theme import get_stylesheet
+
 # --- APPLICATION CONTROLLER ---
 class MattermostApp:
     def __init__(self, qapp):
@@ -94,6 +97,10 @@ class MattermostApp:
         self.settings_dialog = SettingsDialog(controller=self)
         self.settings_dialog.finished.connect(lambda: setattr(self, 'settings_dialog', None))
         self.settings_dialog.show()
+
+    def on_save_settings(self):
+        log.debug("on_save_settings")
+        self.qapp.setStyleSheet(get_stylesheet(config.get("THEME", "light")))
 
     def quit(self):
         mattermost_listener.running = False

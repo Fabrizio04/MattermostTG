@@ -25,5 +25,6 @@ def fetch_user_id(ws_url, token):
         else:
             log.error(f"Impossibile recuperare il proprio user_id (Status: {response.status_code})")
     except Exception as e:
-        log.error(f"Errore durante la chiamata a /api/v4/users/me: {e}")
+        log.error(f"Errore durante la chiamata a /api/v4/users/me")
+        log.error(e)
     return None
