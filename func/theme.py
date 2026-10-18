@@ -1,3 +1,5 @@
+import sys
+
 # Palette dei colori per i due temi
 DARK_THEME = {
     "bg_color": "#2b2b2b",
@@ -18,6 +20,34 @@ LIGHT_THEME = {
     "btn_fg": "#ffffff",
     "border_color": "#cccccc"
 }
+
+def get_platform_font_css(size_px=13):
+    """
+    Restituisce la regola CSS per i font ottimizzata in base al sistema operativo attivo.
+    """
+    if sys.platform.startswith("win"):
+        # Windows: Segoe UI (il font nativo di Win 10/11)
+        font_family = '"Segoe UI", "Arial", sans-serif'
+    elif sys.platform.startswith("darwin"):
+        # macOS: San Francisco (.SF NS Text / -apple-system)
+        font_family = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif'
+    else:
+        # Linux (Ubuntu, Mint, MX Linux, ecc.): Ubuntu / Cantarell / Noto Sans
+        font_family = '"Ubuntu", "Cantarell", "Noto Sans", "DejaVu Sans", sans-serif'
+
+    return f"""
+        QWidget {{
+            font-family: {font_family};
+            font-size: {size_px}px;
+        }}
+        QMenuBar, QMenu {{
+            font-family: {font_family};
+            font-size: {size_px}px;
+        }}
+        QDialog, QMessageBox {{
+            font-family: {font_family};
+        }}
+    """
 
 def get_stylesheet(theme_name="light"):
     theme = DARK_THEME if theme_name == "dark" else LIGHT_THEME
@@ -173,5 +203,6 @@ def get_stylesheet(theme_name="light"):
             padding: 0 5px;
             color: {theme["fg_color"]};
         }}
+        {get_platform_font_css()}
     """
 
