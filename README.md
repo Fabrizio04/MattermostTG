@@ -39,6 +39,7 @@ MattermostTG/
     ├── format_notification.py     # Funzione per formattazione notifica
     ├── message_queue.py           # Gestione retry e coda di invio
     ├── message.py                 # Invio chiamate API verso Telegram
+    ├── theme.py                   # Gestione tema e stili applicazione
     └── utils.py                   # Gestione percorsi risorse e icone
 ├── img/
     ├── icon_active.ico            # Icona per Windows (Attiva)
@@ -49,6 +50,9 @@ MattermostTG/
     └── mattermosttg.svg           # Immagine vettoriale
 ├── ui/
     ├── AboutDialog.py             # Interfaccia GUI per le informazioni
+    ├── CustomMessageBox.py        # Interfaccia GUI per messaggi generali
+    ├── CustomTitleBar.py          # Componente GUI per barra del titolo
+    ├── DimmerOverlay.py           # Componente GUI per overlay modali
     ├── ExcludedListDialog.py      # Interfaccia GUI per le liste di esclusione
     ├── LogViewerDialog.py         # Interfaccia GUI per i log dell'applicazione
     ├── SettingsDialog.py          # Interfaccia GUI per la configurazione
