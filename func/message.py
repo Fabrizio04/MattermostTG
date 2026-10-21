@@ -3,6 +3,7 @@ import requests
 from logger import log
 from settings import config
 from func.message_queue import enqueue_failed_message
+from func.i18n import get
 
 def send_telegram(text: str, is_retry: bool = False) -> bool:
     """
@@ -14,7 +15,7 @@ def send_telegram(text: str, is_retry: bool = False) -> bool:
     chat_id = config.get("TELEGRAM_CHAT_ID")
 
     if not bot_token or not chat_id:
-        log.error("Token Telegram o Chat ID mancanti!")
+        log.error(get("log.message.missing_tk_id"))
         return
     
     try:
@@ -28,13 +29,13 @@ def send_telegram(text: str, is_retry: bool = False) -> bool:
         response = requests.post(url, json=payload, timeout=int(config.get("TG_HTTP_TIMEOUT", 5)))
 
         if response.status_code == 200:
-            log.info("Notifica inviata con successo su Telegram")
+            log.info(get("log.message.notify_sent"))
             return True
         else:
-            log.error(f"Errore invio Telegram HTTP {response.status_code}: {response.text}")
+            log.error(f"{get("log.message.http_error")} {response.status_code}: {response.text}")
         
     except Exception as e:
-        log.error(f"Errore durante l'invio a Telegram: {e}")
+        log.error(f"{get("log.message.error")} {e}")
 
     if not is_retry:
         enqueue_failed_message(text)

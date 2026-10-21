@@ -17,4 +17,4 @@ def create_toggle_row(label_text, default_val, fallback = True):
     h_layout.addStretch()
     h_layout.addWidget(toggle)
 
-    return container, toggle
+    return container, lbl, toggle

@@ -6,7 +6,8 @@ from logger import log
 from pathlib import Path
 from keyring.errors import KeyringError
 
-# --- COSTANTI & CONFIGURAZIONE ---
+from func.get_system_locale import get_system_locale
+
 APP_NAME = "MattermostNotifier"
 
 APP_DIR = Path.home() / ".mattermost_notifier"
@@ -34,10 +35,10 @@ config = {
     "RETRY_LOGIC_MAX_ATTEMPTS": 5,
     "TG_HTTP_TIMEOUT": 5,
     "LOG_LEVEL": "INFO",
-    "THEME": "light"
+    "THEME": "light",
+    "LANGUAGE": get_system_locale()
 }
 
-# --- CARICAMENTO / SALVATAGGIO SICURO ---
 def load_settings():
     global config
     if os.path.exists(CONFIG_FILE_PATH):
@@ -46,16 +47,17 @@ def load_settings():
                 saved_data = json.load(f)
                 config.update(saved_data)
         except Exception as e:
-            log.error(f"Errore caricamento json: {e}")
+            from func.i18n import get
+            log.error(f"{get("log.settings.error_load")} {e}")
 
     try:
         config["MATTERMOST_TOKEN"] = keyring.get_password(APP_NAME, "MATTERMOST_TOKEN") or ""
         config["TELEGRAM_BOT_TOKEN"] = keyring.get_password(APP_NAME, "TELEGRAM_BOT_TOKEN") or ""
     except (KeyringError, Exception) as e:
-        log.error(f"Errore caricamento keyring (sistema o backend non supportato): {e}")
+        from func.i18n import get
+        log.error(f"{get("log.settings.error_keyring")} {e}")
         config["MATTERMOST_TOKEN"] = config.get("MATTERMOST_TOKEN", "")
         config["TELEGRAM_BOT_TOKEN"] = config.get("TELEGRAM_BOT_TOKEN", "")
-
 
 def reset_settings():
     global config
@@ -80,9 +82,9 @@ def reset_settings():
     import logging
     log.setLevel(logging.INFO)
     config["THEME"] = "light"
+    config["LANGUAGE"] = get_system_locale()
 
-
-def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excluded_channels, echo_suppression, anonymous_mode, include_sender, include_channel, include_message, aes_enabled, always_on_top, ws_val, retry_val, attempts_val, tg_http_val, log_level, theme):
+def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excluded_channels, echo_suppression, anonymous_mode, include_sender, include_channel, include_message, aes_enabled, always_on_top, ws_val, retry_val, attempts_val, tg_http_val, log_level, theme, lang):
     global config
     config["MATTERMOST_WS_URL"] = ws_url
     config["TELEGRAM_CHAT_ID"] = tg_chat_id
@@ -103,6 +105,7 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excl
     config["TG_HTTP_TIMEOUT"] = tg_http_val
     config["LOG_LEVEL"] = log_level
     config["THEME"] = theme
+    config["LANGUAGE"] = lang
 
     try:
         with open(CONFIG_FILE_PATH, "w", encoding="utf-8") as f:
@@ -123,14 +126,18 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excl
                 "RETRY_LOGIC_MAX_ATTEMPTS": attempts_val,
                 "TG_HTTP_TIMEOUT": tg_http_val,
                 "LOG_LEVEL": log_level,
-                "THEME": theme
+                "THEME": theme,
+                "LANGUAGE": lang
             }, f, indent=4)
-        log.debug("Impostazioni salvate con successo.")
+        from func.i18n import get
+        log.debug(get("log.settings.saved"))
     except Exception as e:
-        log.error(f"Errore salvataggio json: {e}")
+        from func.i18n import get
+        log.error(f"{get("log.settings.error_save_settings")} {e}")
 
     try:
         keyring.set_password(APP_NAME, "MATTERMOST_TOKEN", mm_token)
         keyring.set_password(APP_NAME, "TELEGRAM_BOT_TOKEN", tg_token)
     except (KeyringError, Exception) as e:
-        log.error(f"Errore salvataggio keyring: {e}")
+        from func.i18n import get
+        log.error(f"{get("log.settings.error_save_keyring")} {e}")

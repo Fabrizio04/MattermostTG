@@ -1,17 +1,19 @@
-import sys
 import os
-from PyQt6.QtCore import Qt, QPoint
+
 from PyQt6.QtGui import QIcon
-from func.utils import resource_path
+from PyQt6.QtCore import Qt, QPoint
 
 from PyQt6.QtWidgets import (
     QHBoxLayout, QLabel, 
     QPushButton, QWidget
 )
 
+from func.utils import resource_path
+
 class CustomTitleBar(QWidget):
     """Barra del titolo personalizzata, tematizzabile e cross-platform."""
-    def __init__(self, parent=None, title="Impostazioni"):
+
+    def __init__(self, parent=None, title="None"):
         super().__init__(parent)
         self.parent = parent
         self.start_pos = QPoint()
@@ -21,9 +23,8 @@ class CustomTitleBar(QWidget):
         layout.setContentsMargins(10, 5, 5, 5)
         layout.setSpacing(8)
 
-        # Icona (facoltativa)
+        # Icona
         self.icon_label = QLabel()
-        # Se hai un'icona:
         self.icon_label.setPixmap(QIcon(resource_path(os.path.join("img", "icon_active.png"))).pixmap(16, 16))
         layout.addWidget(self.icon_label)
 
@@ -32,9 +33,9 @@ class CustomTitleBar(QWidget):
         self.title_label.setStyleSheet("font-weight: bold; font-size: 13px;")
         layout.addWidget(self.title_label)
 
-        layout.addStretch() # Spinge i pulsanti verso destra
+        layout.addStretch()
 
-        # Pulsante Riduci a Icona (se serve)
+        # Pulsante Riduci a Icona
         # self.btn_minimize = QPushButton("—")
         # self.btn_minimize.setFixedSize(28, 24)
         # self.btn_minimize.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -48,12 +49,10 @@ class CustomTitleBar(QWidget):
         self.btn_close.clicked.connect(self.parent.close)
         layout.addWidget(self.btn_close)
 
-        # Assegniamo una proprietà CSS per poterla stilizzare in theme.py
         self.setObjectName("CustomTitleBar")
         self.btn_close.setObjectName("TitleBarCloseBtn")
-        #self.btn_minimize.setObjectName("TitleBarMinBtn")
 
-    # --- Gestione del trascinamento finestra ---
+    # --- Gestione del trascinamento finestra --- #
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.start_pos = event.globalPosition().toPoint() - self.parent.frameGeometry().topLeft()

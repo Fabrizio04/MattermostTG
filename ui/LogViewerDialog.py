@@ -1,41 +1,37 @@
 import os
+import logging
+
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QFont, QGuiApplication, QIcon
 from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QWidget,
-    QComboBox, QPushButton, QTextEdit, QMessageBox
+    QDialog, QVBoxLayout, QHBoxLayout, QLabel,
+    QWidget, QComboBox, QPushButton, QTextEdit
 )
 
-from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve
-from func.utils import resource_path
 from logger import log, LOG_FILE_PATH
 from settings import config, save_settings
-from PyQt6.QtGui import QFont, QGuiApplication, QIcon
+
+from ui.LangStatusBridge import i18n_bridge
 from ui.CustomTitleBar import CustomTitleBar
 from ui.CustomMessageBox import CustomMessageBox
 
+from func.i18n import get
+from func.utils import resource_path
+from func.window import fade_animation
+from func.get_system_locale import get_system_locale
+
 class LogViewerDialog(QDialog):
     def __init__(self, parent=None):
-        super().__init__(parent)  # Passiamo il parent per ereditare i livelli z-index/primo piano
-        #self.setWindowTitle("Log Applicazione - Mattermost Notifier")
+        super().__init__(parent)
+
         self.resize(850, 470)
-        ###
-        # --- EFFETTO FADE-IN (COMPARSA SFUMATA) ---
-        self.setWindowOpacity(0.0) # Parte completamente trasparente
-        
-        self.fade_animation = QPropertyAnimation(self, b"windowOpacity")
-        self.fade_animation.setDuration(200) # Durata in millisecondi (es. 0.2 secondi)
-        self.fade_animation.setStartValue(0.0)
-        self.fade_animation.setEndValue(1.0)
-        self.fade_animation.setEasingCurve(QEasingCurve.Type.InOutQuad)
-        
-        # Avvia l'animazione appena la finestra viene creata
-        self.fade_animation.start()
-        ###
+        fade_animation(self)
 
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Dialog)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self.setWindowIcon(QIcon(resource_path(os.path.join("img", "icon_active.png"))))
         
-        self.last_file_pos = 0  # Per leggere solo le novità nel file di log
+        self.last_file_pos = 0
 
         if parent:
             # Usiamo frameGeometry() per includere i bordi/barra del titolo reali della finestra
@@ -70,22 +66,22 @@ class LogViewerDialog(QDialog):
         container_layout.setContentsMargins(0, 0, 0, 0)
         container_layout.setSpacing(0)
 
-        self.title_bar = CustomTitleBar(self, title="Log Applicazione - Mattermost Notifier")
+        self.title_bar = CustomTitleBar(self, title=get("logviewer.title"))
         container_layout.addWidget(self.title_bar)
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(15, 12, 15, 15) # Left, Top, Right, Bottom
-        layout.setSpacing(10) # Spazio verticale costante tra i blocchi
+        layout.setContentsMargins(15, 12, 15, 15)
+        layout.setSpacing(10)
 
-        # --- BARRA SUPERIORE CONTROLLI ---
+        # --- BARRA SUPERIORE CONTROLLI --- #
         top_layout = QHBoxLayout()
 
-        top_layout.addWidget(QLabel("Livello Logging:"))
+        self.logging_level = QLabel(get("logviewer.logging_level"))
+        top_layout.addWidget(self.logging_level)
 
         self.combo_level = QComboBox()
         self.combo_level.addItems(["DEBUG", "INFO", "WARNING", "ERROR"])
         
-        # Imposta il livello attuale da config
         current_level = config.get("LOG_LEVEL", "INFO").upper()
         if current_level in ["DEBUG", "INFO", "WARNING", "ERROR"]:
             self.combo_level.setCurrentText(current_level)
@@ -95,17 +91,17 @@ class LogViewerDialog(QDialog):
 
         top_layout.addStretch()
 
-        self.btn_clear = QPushButton("Svuota Log")
+        self.btn_clear = QPushButton(get("logviewer.clear_log"))
         self.btn_clear.setStyleSheet("background-color: #e63946; color: white; font-weight: bold;")
         self.btn_clear.clicked.connect(self.clear_log_file)
         top_layout.addWidget(self.btn_clear)
 
         layout.addLayout(top_layout)
 
-        # --- TEXTAREA PER IL LOG ---
+        # --- TEXTAREA PER IL LOG --- #
         self.text_area = QTextEdit()
         self.text_area.setReadOnly(True)
-        # Font monospaziato e tema scuro tipo terminale
+        
         font = QFont("Consolas" if os.name == "nt" else "Monospace", 10)
         self.text_area.setFont(font)
         self.text_area.setStyleSheet(
@@ -113,9 +109,9 @@ class LogViewerDialog(QDialog):
         )
         layout.addWidget(self.text_area)
 
-        # --- TIMER PER AGGIORNAMENTO DINAMICO ---
+        # --- TIMER PER AGGIORNAMENTO DINAMICO --- #
         self.timer = QTimer(self)
-        self.timer.setInterval(1000)  # Controlla aggiornamenti ogni secondo
+        self.timer.setInterval(1000)
         self.timer.timeout.connect(self.read_new_logs)
         self.timer.start()
 
@@ -123,30 +119,29 @@ class LogViewerDialog(QDialog):
         main_layout.addWidget(container)
         self.setLayout(main_layout)
 
-        # Prima lettura completa all'apertura
         self.load_full_log()
+
+        i18n_bridge.status_changed.connect(self.update_ui)
 
     def format_log_line(self, line: str) -> str:
         """Converte una riga di log in HTML colorato in base al livello."""
-        # Mapping dei colori per i vari livelli di log
+        
         colors = {
-            "ERROR": "#ff6b6b",    # Rosso chiaro
-            "WARNING": "#feca57",  # Arancione / Giallo
-            "INFO": "#48dbfb",     # Azzurro chiaro
-            "DEBUG": "#a4b0be"     # Grigio tenue
+            "ERROR": "#ff6b6b",
+            "WARNING": "#feca57",
+            "INFO": "#48dbfb",
+            "DEBUG": "#a4b0be"
         }
-
-        # Controlliamo quale livello è presente nella riga
+        
         for level, color in colors.items( ):
             if f"[{level}]" in line:
-                # Coloriamo l'intera riga o evidenziamo il tag
                 return f'<span style="color: {color};">{line}</span>'
         
-        # Se non matcha nessun livello noto, restituisce la riga bianca/standard
         return f'<span style="color: #d4d4d4;">{line}</span>'
 
     def load_full_log(self):
         """Carica l'intero contenuto iniziale del file formattandolo a colori."""
+
         if os.path.exists(LOG_FILE_PATH):
             try:
                 with open(LOG_FILE_PATH, "r", encoding="utf-8") as f:
@@ -154,21 +149,21 @@ class LogViewerDialog(QDialog):
                     if content:
                         lines = content.split("\n")
                         formatted_lines = [self.format_log_line(line) for line in lines]
-                        # Impostiamo il testo come HTML
                         self.text_area.setHtml("<br>".join(formatted_lines))
                         self.last_file_pos = f.tell()
-                        
                         QTimer.singleShot(10, self.scroll_to_bottom)
             except Exception as e:
-                log.error(f"Errore durante la lettura del file di log: {e}")
+                log.error(f"{get("log.logviewer.read_error")} {e}")
 
     def scroll_to_bottom(self):
         """Funzione di supporto per portare lo scroll in fondo."""
+
         scrollbar = self.text_area.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
     def read_new_logs(self):
         """Legge in modo incrementale i nuovi log e li appende formattati a colori."""
+
         if os.path.exists(LOG_FILE_PATH):
             try:
                 with open(LOG_FILE_PATH, "r", encoding="utf-8") as f:
@@ -184,11 +179,9 @@ class LogViewerDialog(QDialog):
                             cursor = self.text_area.textCursor()
                             cursor.movePosition(cursor.MoveOperation.End)
                             
-                            # Aggiunge i nuovi blocchi formattati in HTML
                             for f_line in formatted_lines:
                                 cursor.insertHtml("<br>" + f_line)
                             
-                            # Auto-scroll in fondo
                             self.text_area.verticalScrollBar().setValue(
                                 self.text_area.verticalScrollBar().maximum()
                             )
@@ -197,9 +190,7 @@ class LogViewerDialog(QDialog):
 
     def on_log_level_changed(self, new_level: str):
         """Cambia il livello di logging al volo sia in memoria che su config."""
-        
-        # Imposta il nuovo livello nel logger
-        import logging
+
         level_map = {
             "DEBUG": logging.DEBUG,
             "INFO": logging.INFO,
@@ -227,18 +218,13 @@ class LogViewerDialog(QDialog):
                 config.get("RETRY_LOGIC_MAX_ATTEMPTS", 5),
                 config.get("TG_HTTP_TIMEOUT", 5),
                 new_level,
-                config.get("THEME", "light")
+                config.get("THEME", "light"),
+                config.get("LANGUAGE", get_system_locale())
             )
 
     def clear_log_file(self):
         """Chiede conferma e svuota il file di log."""
-        # reply = QMessageBox.question(
-        #     self,
-        #     "Conferma Pulizia",
-        #     "Sei sicuro di voler cancellare l'intero contenuto del file di log?",
-        #     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-        #     QMessageBox.StandardButton.No
-        # )
+
         reply = CustomMessageBox.ask_yes_no(self, "Conferma Pulizia", "Sei sicuro di voler cancellare l'intero contenuto del file di log?")
 
         if reply == "yes":
@@ -247,10 +233,14 @@ class LogViewerDialog(QDialog):
                     f.write("")
                 self.text_area.clear()
                 self.last_file_pos = 0
-                log.info("File di log svuotato dall'utente.")
+                log.info(get("log.logviewer.clear"))
             except Exception as e:
                 CustomMessageBox.show_critical(self, "Errore", f"Impossibile svuotare il log: {e}")
-                # QMessageBox.critical(self, "Errore", f"Impossibile svuotare il log: {e}")
+
+    def update_ui(self):
+        self.title_bar.title_label.setText(get("logviewer.title"))
+        self.logging_level.setText(get("logviewer.logging_level"))
+        self.btn_clear.setText(get("logviewer.clear_log"))
 
     def closeEvent(self, event):
         """Ferma il timer quando la finestra viene chiusa."""

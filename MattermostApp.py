@@ -1,16 +1,20 @@
 import threading
 import mattermost_listener
 
-from logger import log
 from PyQt6.QtGui import QAction
-from ui.WSStatusBridge import ws_bridge
-from ui.SettingsDialog import SettingsDialog
 from PyQt6.QtWidgets import QSystemTrayIcon, QMenu
-from func.utils import make_circle_icon, get_tray_icon
-from func.message_queue import start_retry_worker, stop_retry_worker
 
+from logger import log
 from settings import config
+
+from ui.WSStatusBridge import ws_bridge
+from ui.LangStatusBridge import i18n_bridge
+from ui.SettingsDialog import SettingsDialog
+
+from func.i18n import get
+from func.utils import get_tray_icon
 from func.theme import get_stylesheet
+from func.message_queue import start_retry_worker, stop_retry_worker
 
 # --- APPLICATION CONTROLLER ---
 class MattermostApp:
@@ -27,26 +31,25 @@ class MattermostApp:
         # Menu Contestuale
         self.menu = QMenu()
 
-        # Creiamo un'azione di sola lettura standard (funziona sia su Windows che su Linux)
-        self.tray_ws_action = QAction("Mattermost: Disconnesso", self.menu)
+        self.tray_ws_action = QAction("Mattermost", self.menu)
         self.tray_ws_action.setEnabled(False)
         self.menu.addAction(self.tray_ws_action)
         
         self.menu.addSeparator()
         
-        self.action_active = QAction("Notifiche Attive", self.menu)
+        self.action_active = QAction(get("tray.notifications_active"), self.menu)
         self.action_active.setCheckable(True)
         self.action_active.setChecked(True)
         self.action_active.triggered.connect(self.toggle_service)
         self.menu.addAction(self.action_active)
 
-        self.action_settings = QAction("Impostazioni", self.menu)
+        self.action_settings = QAction(get("tray.settings"), self.menu)
         self.action_settings.triggered.connect(self.open_settings)
         self.menu.addAction(self.action_settings)
 
         self.menu.addSeparator()
 
-        self.action_quit = QAction("Esci", self.menu)
+        self.action_quit = QAction(get("tray.exit"), self.menu)
         self.action_quit.triggered.connect(self.quit)
         self.menu.addAction(self.action_quit)
 
@@ -60,11 +63,22 @@ class MattermostApp:
         ws_bridge.status_changed.connect(self.update_tray_ws_status)
         self.update_tray_ws_status(mattermost_listener.is_websocket_connected())
 
+        i18n_bridge.status_changed.connect(self.update_tray_menu)
+
+    def update_tray_menu(self, _):
+        self.action_active.setText(get("tray.notifications_active"))
+        self.action_settings.setText(get("tray.settings"))
+        self.action_quit.setText(get("tray.exit"))
+        if mattermost_listener.is_websocket_connected():
+            self.tray_ws_action.setText(f"🟢 {get("tray.status_connected")}")
+        else:
+            self.tray_ws_action.setText(f"🔴 {get("tray.status_disconnected")}")
+
     def update_tray_ws_status(self, is_connected: bool):
         if is_connected:
-            self.tray_ws_action.setText("🟢 Mattermost: Connesso")
+            self.tray_ws_action.setText(f"🟢 {get("tray.status_connected")}")
         else:
-            self.tray_ws_action.setText("🔴 Mattermost: Disconnesso")
+            self.tray_ws_action.setText(f"🔴 {get("tray.status_disconnected")}")
 
     def toggle_service(self, checked):
         mattermost_listener.service_active = checked
@@ -77,10 +91,8 @@ class MattermostApp:
                 self.settings_dialog.raise_()
 
     def on_tray_activated(self, reason):
-        # Se l'utente fa doppio clic, inattiva/attiva il servizio al volo
         if reason == QSystemTrayIcon.ActivationReason.DoubleClick:
             new_state = not mattermost_listener.service_active
-            # Aggiorna anche la spunta nel menu contestuale per coerenza
             self.action_active.setChecked(new_state)
             self.toggle_service(new_state)
 
@@ -88,7 +100,6 @@ class MattermostApp:
         self.tray_icon.setIcon(get_tray_icon(mattermost_listener.service_active))
 
     def open_settings(self):
-        # Se la finestra è già aperta, la porta in primo piano senza crearne una nuova
         if self.settings_dialog is not None and self.settings_dialog.isVisible():
             self.settings_dialog.activateWindow()
             self.settings_dialog.raise_()
@@ -99,7 +110,6 @@ class MattermostApp:
         self.settings_dialog.show()
 
     def on_save_settings(self):
-        log.debug("on_save_settings")
         self.qapp.setStyleSheet(get_stylesheet(config.get("THEME", "light")))
 
     def quit(self):
@@ -107,5 +117,5 @@ class MattermostApp:
         stop_retry_worker()
         self.tray_icon.hide()
         self.qapp.quit()
-        log.info("Servizio terminato")
+        log.info(get("log.service.ended"))
         #os._exit(0)

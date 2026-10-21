@@ -1,6 +1,6 @@
-from PyQt6.QtCore import Qt, QRectF, QPropertyAnimation, pyqtProperty
-from PyQt6.QtGui import QPainter, QColor, QBrush
 from PyQt6.QtWidgets import QCheckBox
+from PyQt6.QtGui import QPainter, QColor, QBrush
+from PyQt6.QtCore import Qt, QRectF, QPropertyAnimation, pyqtProperty
 
 class ToggleSwitch(QCheckBox):
     def __init__(self, parent=None):
@@ -32,7 +32,6 @@ class ToggleSwitch(QCheckBox):
         checked = (state == 2)
         target_pos = 27.0 if checked else 3.0
         
-        # Se siamo già nella posizione giusta, evitiamo animazioni superflue
         if self._circle_position == target_pos:
             return
 

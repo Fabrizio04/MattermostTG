@@ -1,6 +1,5 @@
 import sys
 
-# Palette dei colori per i due temi
 DARK_THEME = {
     "bg_color": "#2b2b2b",
     "fg_color": "#ffffff",
@@ -35,24 +34,37 @@ def get_platform_font_css(size_px=13):
         # Linux (Ubuntu, Mint, MX Linux, ecc.): Ubuntu / Cantarell / Noto Sans
         font_family = '"Ubuntu", "Cantarell", "Noto Sans", "DejaVu Sans", sans-serif'
 
+    # return f"""
+    #     QWidget {{
+    #         font-family: {font_family};
+    #         font-size: {size_px}px;
+    #     }}
+    #     QMenuBar, QMenu {{
+    #         font-family: {font_family};
+    #         font-size: {size_px}px;
+    #     }}
+    #     QDialog, QMessageBox {{
+    #         font-family: {font_family};
+    #     }}
+    # """
+
     return f"""
+        /* 1. Impostiamo SOLO la famiglia del font a livello globale (così Ubuntu usa il font giusto) */
         QWidget {{
             font-family: {font_family};
-            font-size: {size_px}px;
         }}
-        QMenuBar, QMenu {{
+        
+        /* 2. Applichiamo la dimensione in pixel solo ai componenti di testo e controllo specifici, 
+              evitando di forzarla sul QWidget padre e salvando la QComboBox da conflitti */
+        QPushButton, QLabel, QLineEdit, QTextEdit, QMenuBar, QMenu, QDialog, QMessageBox {{
             font-family: {font_family};
             font-size: {size_px}px;
-        }}
-        QDialog, QMessageBox {{
-            font-family: {font_family};
         }}
     """
 
 def get_stylesheet(theme_name="light"):
+
     theme = DARK_THEME if theme_name == "dark" else LIGHT_THEME
-    
-    # Colori specifici basati sul tema corrente
     menu_hover_bg = "#383838" if theme_name == "dark" else "#e0e0e0"
     menu_hover_fg = "#ffffff" if theme_name == "dark" else "#000000"
     active_bg = "#444444" if theme_name == "dark" else "#d0d0d0"

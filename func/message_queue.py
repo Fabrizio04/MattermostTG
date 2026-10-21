@@ -3,40 +3,33 @@ import queue
 import threading
 
 from logger import log
+from func.i18n import get
 from settings import config
+from model.FailedMessage import FailedMessage
 
-# Coda thread-safe per i messaggi non inviati
 message_retry_queue = queue.Queue()
-
-# Flag per il controllo del thread worker
 _worker_running = True
 _worker_thread = None
-
-class FailedMessage:
-    def __init__(self, notification_msg: str):
-        self.notification_msg = notification_msg
-        self.attempts = 0
-        self.created_at = time.time()
 
 def enqueue_failed_message(notification_msg: str):
     """
     Aggiunge un messaggio fallito alla coda di tentativi.
     """
+
     msg_obj = FailedMessage(notification_msg)
     message_retry_queue.put(msg_obj)
-    log.warning(f"Messaggio aggiunto alla coda di retry (Elementi in coda: {message_retry_queue.qsize()})")
+    log.warning(get("log.message_queue.added").format(qsize=message_retry_queue.qsize()))
 
 def _retry_worker():
     """
     Thread worker che ciclicamente controlla la coda e ritenta l'invio.
     """
-    from func.message import send_telegram  # Import locale per evitare import circolare
+    from func.message import send_telegram
 
     global _worker_running
-    log.debug("Worker Retry Logic avviato.")
+    log.debug(get("log.message_queue.start"))
 
     while _worker_running:
-        # Recupera i timeout e max tentativi aggiornati dalle config
         retry_interval = int(config.get("RETRY_LOGIC_TIMEOUT", 10))
         max_attempts = int(config.get("RETRY_LOGIC_MAX_ATTEMPTS", 5))
 
@@ -44,32 +37,23 @@ def _retry_worker():
             msg_obj = message_retry_queue.get()
 
             if msg_obj.attempts >= max_attempts:
-                log.error(
-                    f"Messaggio scartato: raggiunto il limite massimo di {max_attempts} tentativi. "
-                    f"Testo: {msg_obj.notification_msg[:30]}..."
-                )
+                log.error(f"{get("log.message_queue.discarded").format(max_attempts=max_attempts)}{get("log.message_queue.discarded_text").format(msg=msg_obj.notification_msg[:30])}")
                 message_retry_queue.task_done()
                 continue
 
             msg_obj.attempts += 1
-            log.info(
-                f"Tentativo {msg_obj.attempts}/{max_attempts} per il messaggio in coda "
-                f"(Elementi rimasti: {message_retry_queue.qsize() + 1})..."
-            )
+            log.info(f"{get("log.message_queue.attempts").format(attempts=msg_obj.attempts, max_attempts=max_attempts)}{get("log.message_queue.remaining").format(qsize=(message_retry_queue.qsize() + 1))}")
 
-            # Tenta il reinvio verso Telegram
             success = send_telegram(msg_obj.notification_msg, is_retry=True)
 
             if success:
-                log.info(f"Messaggio in coda inviato con successo al tentativo {msg_obj.attempts}.")
+                log.info(get("log.message_queue.msg_sent").format(attempts=msg_obj.attempts))
                 message_retry_queue.task_done()
             else:
-                log.warning(f"Invio fallito per il messaggio in coda (tentativo {msg_obj.attempts}). Re-inserimento in coda.")
-                # Rimettiamo il messaggio in fondo alla coda per riprovare al prossimo ciclo
+                log.warning(get("log.message_queue.meg_sent_fail").format(attempts=msg_obj.attempts))
                 message_retry_queue.put(msg_obj)
                 message_retry_queue.task_done()
 
-        # Attesa configurabile prima del prossimo ciclo
         time.sleep(retry_interval)
 
 def start_retry_worker():

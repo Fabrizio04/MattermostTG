@@ -1,0 +1,281 @@
+{
+    "_metadata": {
+        "language_name": "Italiano (Italian)",
+        "version": "1.1.0",
+        "author": "Fabrizio Amorelli",
+        "contact": "https://github.com/Fabrizio04",
+        "flag_base64": "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"
+    },
+    "tray": {
+        "status_connected": "Mattermost: Connesso",
+        "status_disconnected": "Mattermost: Disconnesso",
+        "notifications_active": "Notifiche Attive",
+        "settings": "Impostazioni",
+        "exit": "Esci"
+    },
+    "main": {
+        "lock_title": "Applicazione già in esecuzione",
+        "lock_message": "Mattermost Notifier è già attivo nella tray area del sistema in uso.",
+        "yes": "Sì",
+        "no": "No",
+        "save": "Salva",
+        "discard": "Scarta",
+        "cancel": "Annulla"
+    },
+    "settings": {
+        "title": "Impostazioni - Mattermost Notifier",
+        "menubar": {
+            "file": {
+                "import": "Importa impostazioni da JSON",
+                "export": "Esporta impostazioni in JSON",
+                "exit": "Esci"
+            },
+            "edit": {
+                "title": "Modifica",
+                "notifications_active": "Notifiche Attive",
+                "senders_discard": "Mittenti da scartare...",
+                "channels_discard": "Canali da scartare...",
+                "default_settings": "Ripristina impostazioni predefinite"
+            },
+            "view": {
+                "title": "Visualizza",
+                "always_on_top": "Finestra in primo piano",
+                "theme": "Tema (chiaro / scuro)",
+                "language": "Lingua"
+            },
+            "advanced": {
+                "title": "Avanzate",
+                "timeout": "Impostazioni timeout",
+                "log": "Log applicazione"
+            },
+            "aes": {
+                "title": "Aes-256",
+                "regeneration": "Rigenerazione chiave privata Aes-256",
+                "download1": "Download chiave privata",
+                "download2": "Download decrypter html",
+                "download3": "Download decrypter html + chiave"
+            },
+            "help": {
+                "title": "Aiuto",
+                "update": "Verifica aggiornamenti",
+                "about": "Informazioni"
+            }
+        },
+        "import": {
+            "caption": "Importa Impostazioni",
+            "info": {
+                "title": "Importazione",
+                "message": "Impostazioni importate! Riavvia la finestra per vedere le modifiche."
+            },
+            "critical": {
+                "title": "Errore",
+                "message": "Impossibile importare:"
+            }
+        },
+        "export": {
+            "caption": "Esporta Impostazioni",
+            "info": {
+                "title": "Esportazione",
+                "message": "Impostazioni esportate con successo!"
+            },
+            "warning": {
+                "title": "Attenzione",
+                "message": "File di configurazione non trovato."
+            },
+            "critical": {
+                "title": "Errore",
+                "message": "Impossibile esportare:"
+            }
+        },
+        "reset": {
+            "ask": {
+                "title": "Conferma Reset",
+                "message": "Sei sicuro di voler ripristinare le impostazioni predefinite?\nTutti i campi e i token salvati verranno cancellati."
+            },
+            "info": {
+                "title": "Reset Completato",
+                "message": "Le impostazioni sono state ripristinate con successo."
+            }
+        },
+        "aes": {
+            "regeneration": {
+                "ask": {
+                    "title": "Rigenera Chiave",
+                    "message": "Rigenerare la chiave invaliderà i messaggi cifrati precedenti con la chiave vecchia. Continuare?"
+                },
+                "info": {
+                    "title": "Chiave Rigenerata",
+                    "message": "La nuova chiave AES-256 è stata generata e salvata nel keyring."
+                },
+                "critical": {
+                    "title": "Errore",
+                    "message": "Errore nella rigenerazione:"
+                }
+            },
+            "key": {
+                "caption": "Salva Chiave AES",
+                "filename": "chiave_aes",
+                "info": {
+                    "title": "Download",
+                    "message": "Chiave salvata con successo!"
+                }
+            },
+            "decrypter": {
+                "caption": "Salva Decifratore AES",
+                "filename": "decrypter_personale",
+                "info": {
+                    "title": "Download Completato",
+                    "message": "Il decifratore personalizzato è stato salvato con successo in:"
+                },
+                "warning": {
+                    "title": "Attenzione",
+                    "message": "File template 'decrypter.html' non trovato nella directory dell'applicazione."
+                },
+                "critical": {
+                    "title": "Errore",
+                    "message": "Impossibile generare il file di decifrazione:"
+                }
+            }
+        },
+        "ui": {
+            "ws_url_placeholder": "wss://mattermost.tuodominio.it/api/v4/websocket",
+            "toggle_aes": "Crittografia Contenuto AES-256",
+            "chk_echo": "Filtra automaticamente i miei messaggi (Echo Suppression)",
+            "toggle_anon": "Modalità Anonima (nascondi dettagli)",
+            "group_granular": "Campi da includere nelle notifiche:",
+            "toggle_channel": "Includi Canale",
+            "toggle_sender": "Includi Mittente",
+            "toggle_message": "Includi Contenuto Messaggio",
+            "btn_save": "Salva Modifiche",
+            "marker_ws": {
+                "connected": "Stato WebSocket: Connesso",
+                "disconnected": "Stato WebSocket: Disconnesso"
+            },
+            "marker_srv": {
+                "active": "Stato Servizio: Attivo",
+                "inactive": "Stato Servizio: Fermo"
+            }
+        },
+        "save": {
+            "title": "Salvato",
+            "message": "Le impostazioni sono state salvate!"
+        },
+        "check_on_close": {
+            "title": "Modifiche non salvate",
+            "message": "Hai modificato alcune impostazioni senza salvarle.\nVuoi salvare le modifiche prima di chiudere?"
+        }
+    },
+    "excludedlist": {
+        "senders": {
+            "title_text": "Mittenti da Scartare",
+            "label_text": "Mittenti da scartare (uno per riga o separati da virgola):"
+        },
+        "channels": {
+            "title_text": "Canali da Scartare",
+            "label_text": "Canali da scartare (uno per riga o separati da virgola):"
+        },
+        "alert_title": "Salvato",
+        "alert_message": "La lista è stata aggiornata con successo!"
+    },
+    "language": {
+        "title": "Seleziona lingua",
+        "col0": "Lingue installate",
+        "col1": "Versione",
+        "col2": "Autore",
+        "col3": "Contatto",
+        "col4": "File",
+        "btn_open_folder": "Apri cartella",
+        "btn_apply": "Applica",
+        "btn_close": "Chiudi",
+        "alert_title": "Cambio lingua",
+        "alert_message": "La lingua è stata cambiata con successo."
+    },
+    "timeout": {
+        "title": "Impostazioni Timeout & Retry",
+        "group_box": "Configurazione Intervalli",
+        "field1": "Timeout Riconnessione:",
+        "field2": "Timeout Retry Logic:",
+        "field3": "Max Tentativi Retry:",
+        "field4": "Timeout HTTP Telegram:",
+        "alert_title": "Salvato",
+        "alert_message": "Impostazioni aggiornate con successo!"
+    },
+    "logviewer": {
+        "title": "Log Applicazione - Mattermost Notifier",
+        "logging_level": "Livello Logging:",
+        "clear_log": "Svuota Log"
+    },
+    "about": {
+        "title": "Informazioni - Mattermost Notifier",
+        "version": "Versione",
+        "created": "Creato con cura da",
+        "license": "Licenza",
+        "desc1": "Un'applicazione tray leggera, sicura ed elegante",
+        "desc2": "per inoltrare notifiche in tempo reale.",
+        "url_text": "Visita il repository su GitHub",
+        "btn_close": "Chiudi"
+    },
+    "log": {
+        "service": {
+            "started": "Servizio avviato",
+            "closing": "Chiusura in corso...",
+            "ended": "Servizio terminato"
+        },
+        "listener": {
+            "ws_connection": "Connessione al WebSocket Mattermost in corso...",
+            "ws_auth": "Autenticazione WebSocket completata.",
+            "msg_discarded_echo": "Messaggio scartato (Echo Suppression).",
+            "msg_discarded_sender": "Messaggio scartato: mittente '{sender_name}' in lista di esclusione.",
+            "msg_discarded_channel": "Messaggio scartato: canale '{channel_display_name}' in lista di esclusione.",
+            "formatted_message": "Messaggio formattato:",
+            "invalid_formatting": "Messaggio formattato non valido",
+            "service_pause": "Servizio in pausa: notifica ignorata",
+            "ws_error": "Errore di connessione Mattermost WS",
+            "reconnection": "Riconnessione tra {n} secondi...",
+            "reconnection_settings_change": "Riconnessione WebSocket richiesta a seguito di modifiche..."
+        },
+        "settings": {
+            "error_load": "Errore caricamento json:",
+            "error_keyring": "Errore caricamento keyring (sistema o backend non supportato):",
+            "saved": "Impostazioni salvate con successo.",
+            "error_save_settings": "Errore salvataggio json:",
+            "error_save_keyring": "Errore salvataggio keyring:",
+            "error_reset": "Errore rimozione file config:"
+        },
+        "aes": {
+            "error_save_keyring": "Salvataggio chiave AES nel keyring fallito:",
+            "error_execution": "Errore nell'esecuzione AES:"
+        },
+        "fetch_user_id": {
+            "user_id": "User ID recuperato con successo dall'API:",
+            "http_error": "Impossibile recuperare il proprio user_id (Status: {status_code})",
+            "error": "Errore durante la chiamata a /api/v4/users/me"
+        },
+        "i18n": {
+            "error": "Errore caricamento lingua da file {lang_file}:"
+        },
+        "message_queue": {
+            "added": "Messaggio aggiunto alla coda di retry (Elementi in coda: {qsize})",
+            "start": "Worker Retry Logic avviato.",
+            "discarded": "Messaggio scartato: raggiunto il limite massimo di {max_attempts} tentativi. ",
+            "discarded_text": "Testo: {msg}...",
+            "attempts": "Tentativo {attempts}/{max_attempts} per il messaggio in coda ",
+            "remaining": "(Elementi rimasti: {qsize})...",
+            "msg_sent": "Messaggio in coda inviato con successo al tentativo {attempts}.",
+            "meg_sent_fail": "Invio fallito per il messaggio in coda (tentativo {attempts}). Re-inserimento in coda."
+        },
+        "message": {
+            "missing_tk_id": "Token Telegram o Chat ID mancanti!",
+            "notify_sent": "Notifica inviata con successo su Telegram",
+            "http_error": "Errore invio Telegram HTTP",
+            "error": "Errore durante l'invio a Telegram:"
+        },
+        "utils": {
+            "ico_nf": "File icona non trovato:"
+        },
+        "logviewer": {
+            "read_error": "Errore durante la lettura del file di log:",
+            "clear": "File di log svuotato dall'utente."
+        }
+    }
+}

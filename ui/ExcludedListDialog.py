@@ -1,17 +1,17 @@
-import os
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QLabel, QHBoxLayout,
-    QTextEdit, QPushButton, QMessageBox, QWidget
+    QTextEdit, QPushButton, QWidget
 )
-from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve
-from PyQt6.QtGui import QIcon
-from func.utils import resource_path
+
 from settings import config, save_settings
-from func.check_on_close import check_on_close
 
 from ui.CustomTitleBar import CustomTitleBar
-from ui.DimmerOverlay import DimmerOverlay
 from ui.CustomMessageBox import CustomMessageBox
+
+from func.i18n import get
+from func.check_on_close import check_on_close
+from func.get_system_locale import get_system_locale
+from func.window import initialize_window, exec_with_parent_dim
 
 class ExcludedListDialog(QDialog):
     def __init__(self, list_type: str, parent=None):
@@ -20,39 +20,15 @@ class ExcludedListDialog(QDialog):
         
         # Configuriamo etichette e chiavi in base al tipo
         if self.list_type == "senders":
-            self.title_text = "Gestione Mittenti da Scartare"
-            self.label_text = "Mittenti da scartare (uno per riga o separati da virgola):"
+            self.title_text = get("excludedlist.senders.title_text")
+            self.label_text = get("excludedlist.senders.label_text")
             self.config_key = "EXCLUDED_SENDERS"
         else:
-            self.title_text = "Gestione Canali da Scartare"
-            self.label_text = "Canali da scartare (uno per riga o separati da virgola):"
+            self.title_text = get("excludedlist.channels.title_text")
+            self.label_text = get("excludedlist.channels.label_text")
             self.config_key = "EXCLUDED_CHANNELS"
 
-        #self.setWindowTitle(self.title_text)
-        self.setFixedSize(400, 300)
-        ###
-        # --- EFFETTO FADE-IN (COMPARSA SFUMATA) ---
-        self.setWindowOpacity(0.0) # Parte completamente trasparente
-        
-        self.fade_animation = QPropertyAnimation(self, b"windowOpacity")
-        self.fade_animation.setDuration(200) # Durata in millisecondi (es. 0.2 secondi)
-        self.fade_animation.setStartValue(0.0)
-        self.fade_animation.setEndValue(1.0)
-        self.fade_animation.setEasingCurve(QEasingCurve.Type.InOutQuad)
-        
-        # Avvia l'animazione appena la finestra viene creata
-        self.fade_animation.start()
-        ###
-
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Dialog)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
-
-        # self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
-        if config.get("ALWAYS_ON_TOP", False) == True:
-            self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
-        else:
-            self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowStaysOnTopHint)
-        self.setWindowIcon(QIcon(resource_path(os.path.join("img", "icon_active.png"))))
+        initialize_window(self, 400, 300)
 
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -68,8 +44,8 @@ class ExcludedListDialog(QDialog):
         container_layout.addWidget(self.title_bar)
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(15, 12, 15, 15) # Left, Top, Right, Bottom
-        layout.setSpacing(10) # Spazio verticale costante tra i blocchi
+        layout.setContentsMargins(15, 12, 15, 15)
+        layout.setSpacing(10)
 
         # Etichetta descrittiva
         layout.addWidget(QLabel(self.label_text))
@@ -83,12 +59,11 @@ class ExcludedListDialog(QDialog):
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
 
-        self.btn_cancel = QPushButton("Annulla")
+        self.btn_cancel = QPushButton(get("main.cancel"))
         self.btn_cancel.clicked.connect(self.close)
         btn_layout.addWidget(self.btn_cancel)
 
-        self.btn_save = QPushButton("Salva")
-        #self.btn_save.setStyleSheet("background-color: #007acc; color: white; font-weight: bold;")
+        self.btn_save = QPushButton(get("main.save"))
         self.btn_save.clicked.connect(lambda: self.save_list())
         btn_layout.addWidget(self.btn_save)
 
@@ -97,7 +72,6 @@ class ExcludedListDialog(QDialog):
         container_layout.addLayout(layout)
         main_layout.addWidget(container)
         self.setLayout(main_layout)
-        # self.setLayout(layout)
 
     def save_list(self, showMessage=True):
         content = self.text_area.toPlainText().strip()
@@ -121,12 +95,12 @@ class ExcludedListDialog(QDialog):
             config.get("RETRY_LOGIC_MAX_ATTEMPTS", 5),
             config.get("TG_HTTP_TIMEOUT", 5),
             config.get("LOG_LEVEL", "INFO"),
-            config.get("THEME", "light")
+            config.get("THEME", "light"),
+            config.get("LANGUAGE", get_system_locale())
         )
 
         if showMessage == True:
-            CustomMessageBox.show_info(self, "Salvato", "La lista è stata aggiornata con successo!")
-            # QMessageBox.information(self, "Salvato", "La lista è stata aggiornata con successo!")
+            CustomMessageBox.show_info(self, get("excludedlist.alert_title"), get("excludedlist.alert_message"))
 
         self.accept()
 
@@ -157,27 +131,4 @@ class ExcludedListDialog(QDialog):
     @staticmethod
     def open_ExcludedListDialog(list_type, parent):
         dlg = ExcludedListDialog(list_type = list_type, parent=parent)
-        #dlg.exec()
-        ExcludedListDialog._exec_with_parent_dim(dlg, parent)
-
-    @staticmethod
-    def _exec_with_parent_dim(dlg, parent):
-        overlay = None
-        if parent:
-            current_theme = config.get("THEME", "light")
-            
-            if current_theme == "dark":
-                # Nero semitrasparente per il tema scuro
-                rgba_css = "rgba(0, 0, 0, 130)"
-            else:
-                # Nero più marcato (circa al 50-60% di opacità) per spegnere il bianco del tema chiaro
-                rgba_css = "rgba(0, 0, 0, 150)"
-                
-            overlay = DimmerOverlay(parent, rgba_css)
-            overlay.show()
-
-        try:
-            dlg.exec()
-        finally:
-            if overlay:
-                overlay.deleteLater()
+        exec_with_parent_dim(dlg, parent)
