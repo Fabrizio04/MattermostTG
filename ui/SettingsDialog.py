@@ -305,6 +305,7 @@ class SettingsDialog(QDialog):
         self.act_logs.setText(get("settings.menubar.advanced.log"))
 
         self.menu_aes.setTitle(get("settings.menubar.aes.title"))
+        self.act_regen_key.setText(get("settings.menubar.aes.regeneration"))
         self.act_download_key.setText(get("settings.menubar.aes.download1"))
         self.act_download_dec.setText(get("settings.menubar.aes.download2"))
         self.act_download_dec_key.setText(get("settings.menubar.aes.download3"))
