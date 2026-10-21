@@ -37,10 +37,16 @@ MattermostTG/
     ├── create_toggle_row.py       # Funzione per creazione toggle row
     ├── fetch_user_id.py           # Funzione per salvataggio id utente
     ├── format_notification.py     # Funzione per formattazione notifica
+    ├── get_system_locale.py       # Funzione per localizzazione corrente
+    ├── i18n.py                    # Gestione localizzazione applicazione
     ├── message_queue.py           # Gestione retry e coda di invio
     ├── message.py                 # Invio chiamate API verso Telegram
     ├── theme.py                   # Gestione tema e stili applicazione
-    └── utils.py                   # Gestione percorsi risorse e icone
+    ├── utils.py                   # Gestione percorsi risorse e icone
+    └── window.py                  # Gestione configurazione finestre
+├── i18n/
+    ├── en_US.json                 # Language pack English en_US
+    └── it_IT.json                 # Language pack Italiano it_IT
 ├── img/
     ├── icon_active.ico            # Icona per Windows (Attiva)
     ├── icon_inactive.ico          # Icona per Windows (Inattiva)
@@ -48,12 +54,16 @@ MattermostTG/
     ├── icon_inactive.png          # Icona per Linux / macOS (Inattiva)
     ├── mattermosttg.af            # Progetto affinity
     └── mattermosttg.svg           # Immagine vettoriale
+├── model/
+    └── FailedMessage.py           # Messaggio per coda retry
 ├── ui/
     ├── AboutDialog.py             # Interfaccia GUI per le informazioni
     ├── CustomMessageBox.py        # Interfaccia GUI per messaggi generali
     ├── CustomTitleBar.py          # Componente GUI per barra del titolo
     ├── DimmerOverlay.py           # Componente GUI per overlay modali
     ├── ExcludedListDialog.py      # Interfaccia GUI per le liste di esclusione
+    ├── LangStatusBridge.py        # Componente GUI bridge di comunicazione
+    ├── LanguageDialog.py          # Interfaccia GUI per la selezione lingua
     ├── LogViewerDialog.py         # Interfaccia GUI per i log dell'applicazione
     ├── SettingsDialog.py          # Interfaccia GUI per la configurazione
     ├── TimeoutSettingsDialog.py   # Interfaccia GUI per i parametri timeout
@@ -114,13 +124,13 @@ MattermostTG/
 ### 🪟 Windows (.exe)
 
 ```bash
-py -m PyInstaller --noconsole --onefile --add-data "img;img" --add-data "aes;aes" --icon="img/icon_active.ico" --name="MattermostNotifier-Win" mattermost_notifier.py
+py -m PyInstaller --noconsole --onefile --add-data "img;img" --add-data "aes;aes" --add-data "i18n;i18n" --icon="img/icon_active.ico" --name="MattermostNotifier-Win" mattermost_notifier.py
 ```
 
 ### 🐧 Linux (Binary ELF)
 
 ```bash
-pyinstaller --noconsole --onefile --add-data "img:img" --add-data "aes:aes" --name "MattermostNotifier-Linux" mattermost_notifier.py
+pyinstaller --noconsole --onefile --add-data "img:img" --add-data "aes:aes" --add-data "i18n:i18n" --name "MattermostNotifier-Linux" mattermost_notifier.py
 ```
 
 Per una guida dettagliata all'installazione permanente e all'integrazione nel menu di sistema su distribuzioni Linux, consulta la [Guida Linux](doc/LINUX_DEPLOY.md).
@@ -128,7 +138,7 @@ Per una guida dettagliata all'installazione permanente e all'integrazione nel me
 ### 🍏 macOS (Binary Executable)
 
 ```bash
-pyinstaller --noconsole --onefile --add-data "img:img" --add-data "aes:aes" --name "MattermostNotifier-macOS" mattermost_notifier.py
+pyinstaller --noconsole --onefile --add-data "img:img" --add-data "aes:aes" --add-data "i18n:i18n" --name "MattermostNotifier-macOS" mattermost_notifier.py
 ```
 
 Troverai il file eseguibile compilato all'interno della cartella `dist/`.
