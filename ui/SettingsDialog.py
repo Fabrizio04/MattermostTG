@@ -502,7 +502,7 @@ class SettingsDialog(QDialog):
                         pass
                 reg.CloseKey(key)
             except Exception as e:
-                log.error(f"Errore gestione avvio automatico Windows: {e}")
+                log.error(f"{get("log.settings.error_regedit")} {e}")
 
         elif sys.platform.startswith("linux"):
             autostart_dir = Path.home() / ".config" / "autostart"

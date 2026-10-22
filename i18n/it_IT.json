@@ -242,7 +242,8 @@
             "saved": "Impostazioni salvate con successo.",
             "error_save_settings": "Errore salvataggio json:",
             "error_save_keyring": "Errore salvataggio keyring:",
-            "error_reset": "Errore rimozione file config:"
+            "error_reset": "Errore rimozione file config:",
+            "error_regedit": "Errore gestione avvio automatico Windows:"
         },
         "aes": {
             "error_save_keyring": "Salvataggio chiave AES nel keyring fallito:",

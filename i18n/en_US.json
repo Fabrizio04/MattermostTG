@@ -242,7 +242,8 @@
             "saved": "Settings saved successfully.",
             "error_save_settings": "Error saving json:",
             "error_save_keyring": "Error saving keyring:",
-            "error_reset": "Error removing config file:"
+            "error_reset": "Error removing config file:",
+            "error_regedit": "Windows automatic startup management error:"
         },
         "aes": {
             "error_save_keyring": "Saving AES key to keyring failed:",
