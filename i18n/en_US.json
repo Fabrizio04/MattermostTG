@@ -67,7 +67,7 @@
             "caption": "Import Settings",
             "info": {
                 "title": "Import",
-                "message": "Settings imported! Restart the window to see the changes."
+                "message": "Settings imported!"
             },
             "critical": {
                 "title": "Error",

@@ -259,7 +259,7 @@ class SettingsDialog(QDialog):
         layout.addWidget(self.row_echo)
 
         # Checkbox modalità anonima
-        self.row_anon, self.lbl_anon, self.toggle_anon = create_toggle_row(get("settings.ui.toggle_anon"), "ANONYMOUS_MODE")
+        self.row_anon, self.lbl_anon, self.toggle_anon = create_toggle_row(get("settings.ui.toggle_anon"), "ANONYMOUS_MODE", False)
         self.toggle_anon.stateChanged.connect(lambda state: self.toggle_anonymous_mode(state))
         layout.addWidget(self.row_anon)
 
@@ -378,9 +378,31 @@ class SettingsDialog(QDialog):
         if file_path:
             try:
                 shutil.copy(file_path, CONFIG_FILE_PATH)
-                from settings import load_settings # O ricarica config
+
+                from settings import load_settings
                 load_settings()
-                #ricaricare la UI...
+
+                self.txt_ws_url.setText(config.get("MATTERMOST_WS_URL", ""))
+                self.txt_tg_chat_id.setText(config.get("TELEGRAM_CHAT_ID", ""))
+                self.toggle_aes.setChecked(config.get("AES_ENCRYPTION_ENABLED", False))
+                self.chk_echo.setChecked(get("ECHO_SUPPRESSION_ENABLED", True))
+                self.toggle_anon.setChecked(get("ANONYMOUS_MODE", False))
+
+                self.toggle_channel.setChecked(get("INCLUDE_CHANNEL", True))
+                self.toggle_sender.setChecked(get("INCLUDE_SENDER", True)) 
+                self.toggle_message.setChecked(get("INCLUDE_MESSAGE", True))
+
+                mattermost_listener.reconnect_websocket()
+
+                load_language()
+                self.update_ui()
+
+                self.on_top_window.setChecked(config.get("ALWAYS_ON_TOP", False))
+                self.update_on_top_window(config.get("ALWAYS_ON_TOP", False), False)
+
+                if self.controller and hasattr(self.controller, "on_save_settings"):
+                    self.controller.on_save_settings()
+                
                 CustomMessageBox.show_info(self, get("settings.import.info.title"), get("settings.import.info.message"))
             except Exception as e:
                 CustomMessageBox.show_critical(self, get("settings.import.critical.title"), f"{get("settings.import.critical.message")} {e}")
@@ -465,7 +487,7 @@ class SettingsDialog(QDialog):
         self.act_notif.setChecked(checked)
         self.update_service_indicator_ui(checked)
 
-    def update_on_top_window(self, checked):
+    def update_on_top_window(self, checked, save=True):
         flags = self.windowFlags()
         if checked:
             flags |= Qt.WindowType.WindowStaysOnTopHint
@@ -474,7 +496,8 @@ class SettingsDialog(QDialog):
             
         self.setWindowFlags(flags)
         self.show()
-        self.save(False)
+        if save:
+            self.save(False)
 
     def open_excluded_dialog(self, list_type):
         ExcludedListDialog.open_ExcludedListDialog(list_type, self)

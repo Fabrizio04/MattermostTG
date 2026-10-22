@@ -67,7 +67,7 @@
             "caption": "Importa Impostazioni",
             "info": {
                 "title": "Importazione",
-                "message": "Impostazioni importate! Riavvia la finestra per vedere le modifiche."
+                "message": "Impostazioni importate!"
             },
             "critical": {
                 "title": "Errore",
