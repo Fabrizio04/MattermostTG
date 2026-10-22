@@ -1,6 +1,8 @@
 import os
+import sys
 import shutil
 import keyring
+from pathlib import Path
 import mattermost_listener
 
 from PyQt6.QtCore import Qt
@@ -14,8 +16,8 @@ from PyQt6.QtWidgets import (
 )
 
 from settings import (
-    APP_NAME, CONFIG_FILE_PATH, config,
-    save_settings, reset_settings
+    APP_NAME, CONFIG_FILE_PATH, APP_DIR,
+    config, save_settings, reset_settings
 )
 
 from logger import log
@@ -27,6 +29,7 @@ from func.check_on_close import check_on_close
 from func.create_toggle_row import create_toggle_row
 from func.get_system_locale import get_system_locale
 from func.window import initialize_window, get_overlay
+from func.check_auto_startup import check_auto_startup
 
 from ui.AboutDialog import AboutDialog
 from ui.WSStatusBridge import ws_bridge
@@ -53,6 +56,12 @@ class SettingsDialog(QDialog):
 
         #region --- MENU FILE --- #
         menu_file = self.menu_bar.addMenu("File")
+
+        self.open_app_path = QAction(get("settings.menubar.file.open_app_path"), self)
+        self.open_app_path.triggered.connect(self.open_app_path_folder)
+        menu_file.addAction(self.open_app_path)
+
+        menu_file.addSeparator()
         
         self.act_import = QAction(get("settings.menubar.file.import"), self)
         self.act_import.triggered.connect(self.import_settings_json)
@@ -113,6 +122,12 @@ class SettingsDialog(QDialog):
 
         #region --- MENU AVANZATE ---
         self.menu_advanced = self.menu_bar.addMenu(get("settings.menubar.advanced.title"))
+
+        self.auto_startup = QAction(get("settings.menubar.advanced.auto_startup"), self)
+        self.auto_startup.setCheckable(True)
+        self.auto_startup.triggered.connect(self.set_auto_startup)
+        self.auto_startup.setChecked(check_auto_startup())
+        self.menu_advanced.addAction(self.auto_startup)
         
         self.act_timeout = QAction(get("settings.menubar.advanced.timeout"), self)
         self.act_timeout.triggered.connect(self.open_timeout_settings)
@@ -285,6 +300,7 @@ class SettingsDialog(QDialog):
     def update_ui(self):
         self.title_bar.title_label.setText(get("settings.title"))
 
+        self.open_app_path.setText(get("settings.menubar.file.open_app_path"))
         self.act_import.setText(get("settings.menubar.file.import"))
         self.act_export.setText(get("settings.menubar.file.export"))
         self.act_exit.setText(get("settings.menubar.file.exit"))
@@ -301,6 +317,7 @@ class SettingsDialog(QDialog):
         self.language.setText(get("settings.menubar.view.language"))
 
         self.menu_advanced.setTitle(get("settings.menubar.advanced.title"))
+        self.auto_startup.setText(get("settings.menubar.advanced.auto_startup"))
         self.act_timeout.setText(get("settings.menubar.advanced.timeout"))
         self.act_logs.setText(get("settings.menubar.advanced.log"))
 
@@ -326,6 +343,16 @@ class SettingsDialog(QDialog):
 
         self.update_ws_indicator_ui(mattermost_listener.is_websocket_connected())
         self.update_service_indicator_ui(mattermost_listener.service_active)
+
+    def open_app_path_folder(self):
+        import sys, subprocess
+        i18n_dir = str(APP_DIR)
+        if sys.platform.startswith("win"):
+            os.startfile(i18n_dir)
+        elif sys.platform.startswith("darwin"):
+            subprocess.Popen(["open", i18n_dir])
+        else:
+            subprocess.Popen(["xdg-open", i18n_dir])
 
     def export_settings_json(self):
         overlay = get_overlay(self)
@@ -451,6 +478,91 @@ class SettingsDialog(QDialog):
 
     def open_excluded_dialog(self, list_type):
         ExcludedListDialog.open_ExcludedListDialog(list_type, self)
+
+    def set_auto_startup(self, checked):
+        if getattr(sys, 'frozen', False):
+            app_path = sys.executable
+            cmd = f'"{app_path}"'
+        else:
+            python_path = sys.executable
+            script_path = os.path.abspath(sys.argv[0])
+            cmd = f'"{python_path}" "{script_path}"'
+
+        if sys.platform.startswith("win"):
+            import winreg as reg
+            key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
+            try:
+                key = reg.OpenKey(reg.HKEY_CURRENT_USER, key_path, 0, reg.KEY_ALL_ACCESS)
+                if checked:
+                    reg.SetValueEx(key, APP_NAME, 0, reg.REG_SZ, cmd)
+                else:
+                    try:
+                        reg.DeleteValue(key, APP_NAME)
+                    except FileNotFoundError:
+                        pass
+                reg.CloseKey(key)
+            except Exception as e:
+                log.error(f"Errore gestione avvio automatico Windows: {e}")
+
+        elif sys.platform.startswith("linux"):
+            autostart_dir = Path.home() / ".config" / "autostart"
+            desktop_file = autostart_dir / "mattermost_notifier.desktop"
+            
+            if checked:
+                autostart_dir.mkdir(parents=True, exist_ok=True)
+
+                if getattr(sys, 'frozen', False):
+                    working_dir = os.path.dirname(sys.executable)
+                else:
+                    working_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+
+                desktop_content = f"""[Desktop Entry]
+Type=Application
+Name=Mattermost Notifier
+Exec={cmd}
+Path={working_dir}
+X-GNOME-Autostart-enabled=true
+Terminal=false
+"""
+                desktop_file.write_text(desktop_content, encoding="utf-8")
+            else:
+                if desktop_file.exists():
+                    desktop_file.unlink()
+
+        elif sys.platform.startswith("darwin"):
+            launch_agents_dir = Path.home() / "Library" / "LaunchAgents"
+            plist_file = launch_agents_dir / "com.mattermost.notifier.plist"
+            
+            if checked:
+                launch_agents_dir.mkdir(parents=True, exist_ok=True)
+
+                if getattr(sys, 'frozen', False):
+                    args_xml = f"<string>{sys.executable}</string>"
+                else:
+                    script_path = os.path.abspath(sys.argv[0])
+                    args_xml = f"<string>{sys.executable}</string>\n        <string>{script_path}</string>"
+
+                plist_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.mattermost.notifier</string>
+    <key>ProgramArguments</key>
+    <array>
+        {args_xml}
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <false/>
+</dict>
+</plist>
+"""
+                plist_file.write_text(plist_content, encoding="utf-8")
+            else:
+                if plist_file.exists():
+                    plist_file.unlink()
 
     def open_timeout_settings(self):
         TimeoutSettingsDialog.open_TimeoutSettingsDialog(self)

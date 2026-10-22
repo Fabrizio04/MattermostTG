@@ -26,6 +26,7 @@
         "title": "Settings - Mattermost Notifier",
         "menubar": {
             "file": {
+                "open_app_path": "Open app folder...",
                 "import": "Import settings from JSON",
                 "export": "Export settings to JSON",
                 "exit": "Exit"
@@ -45,6 +46,7 @@
             },
             "advanced": {
                 "title": "Advanced",
+                "auto_startup": "Auto startup",
                 "timeout": "Timeout settings",
                 "log": "Application log"
             },
