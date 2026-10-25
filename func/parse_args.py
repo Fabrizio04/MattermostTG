@@ -19,6 +19,8 @@ def parse_args():
         epilog=""""""+get("args.env")+"""
   HEADLESS                        """+get("args.headless")+"""
   PORT                            """+get("args.port")+"""
+  HTTP_USER                       """+get("args.http_user")+"""
+  HTTP_PASS                       """+get("args.http_pass")+"""
   CONFIG_PATH                     """+get("args.config")+"""
   MATTERMOST_WS_URL               Mattermost WS URL.
   MATTERMOST_TOKEN                Mattermost Token.
@@ -65,6 +67,20 @@ def parse_args():
         type=int,
         default=int(os.getenv("PORT", "8080")),
         help=get("args.port")
+    )
+
+    parser.add_argument(
+        "--http-user",
+        type=str,
+        default=os.getenv("HTTP_USER", ""),
+        help=get("args.http_user")
+    )
+
+    parser.add_argument(
+        "--http-pass",
+        type=str,
+        default=os.getenv("HTTP_PASS", ""),
+        help=get("args.http_pass")
     )
 
     parser.add_argument(

@@ -63,24 +63,24 @@
 
     <h2>🔐 AES-256 Decrypter</h2>
 
-    <label>Chiave AES-256 (Hex 64 caratteri):</label>
+    <label>===KEY===:</label>
 
     <div style="display: flex; gap: 8px; align-items: center;">
         <input type="password" id="keyHex" value="===MY_PRIVATE_KEY===" style="flex: 1;">
         <input type="file" id="fileKeyInput" style="display: none;" accept=".txt,.key,.html">
         <button id="btnLoadKey" style="margin: 0; width: auto; padding: 10px 14px; background: #334155;"
-            title="Carica chiave da file">📁 Carica</button>
+            title="Carica chiave da file">📁 ===UPLOAD===</button>
     </div>
 
-    <label>Messaggio:</label>
-    <textarea id="payloadBase64" rows="4" placeholder="Incolla qui il testo ricevuto..."></textarea>
+    <label>===PAYLOAD===:</label>
+    <textarea id="payloadBase64" rows="4" placeholder="===PLACEHOLDER==="></textarea>
 
-    <button id="decifra" disabled>🔓 Decifra Messaggio</button>
+    <button id="decifra" disabled>🔓 ===BTN_DECRYPT===</button>
 
-    <h3>Messaggio in Chiaro:</h3>
+    <h3>===MESSAGE===:</h3>
     <div id="risultato">...</div>
 
-    <button id="btnCopy" disabled>📋 Copia Messaggio</button>
+    <button id="btnCopy" disabled>📋 ===BTN_COPY===</button>
 
     <script>
         const inputKey = document.getElementById('keyHex');
@@ -91,7 +91,7 @@
         const fileKeyInput = document.getElementById('fileKeyInput');
         const btnLoadKey = document.getElementById('btnLoadKey');
 
-        const ERRORE_TESTO = "❌ Errore nella decifrazione! Verifica la chiave o il messaggio.";
+        const ERRORE_TESTO = "❌ ===ERROR===";
 
         btnLoadKey.addEventListener("click", () => {
             fileKeyInput.click();
@@ -142,12 +142,12 @@
                 }
 
                 const testoOriginale = btnCopy.innerText;
-                btnCopy.innerText = "✅ Copiato negli appunti!";
+                btnCopy.innerText = "✅ ===COPIED===";
                 setTimeout(() => {
                     btnCopy.innerText = testoOriginale;
                 }, 2000);
             } catch (err) {
-                alert("Impossibile copiare il testo.");
+                alert("===ERROR_COPY===");
             }
         });
 

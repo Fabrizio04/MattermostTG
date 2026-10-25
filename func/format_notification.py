@@ -1,4 +1,5 @@
 from func.aes import aes
+from func.i18n import get
 from settings import config
 from datetime import datetime
 
@@ -7,26 +8,26 @@ def format_notification(create_at_ms, channel, sender, message_text):
     message = ""
     lines = ["🔔 *Mattermost Notifier*"]
 
-    formatted_time = datetime.now().strftime("%d/%m/%Y alle %H:%M")
+    formatted_time = datetime.now().strftime(get('main.date_format'))
 
     if create_at_ms:
         dt = datetime.fromtimestamp(create_at_ms / 1000.0)
-        formatted_time = dt.strftime("%d/%m/%Y alle %H:%M") 
+        formatted_time = dt.strftime(get('main.date_format')) 
 
-    lines.append(f"📅 *Data:* {formatted_time}")
+    lines.append(f"📅 *{get('main.date')}:* {formatted_time}")
 
     if config.get("ANONYMOUS_MODE", False) or (not config.get("INCLUDE_CHANNEL", True) and not config.get("INCLUDE_SENDER", True) and not config.get("INCLUDE_MESSAGE", True)):
-        lines.append("Hai ricevuto un nuovo messaggio!")
+        lines.append(get("main.default_msg"))
         message = "\n".join(lines)
     else:
         if config.get("INCLUDE_CHANNEL", True) and channel:
-            lines.append(f"📢 *Canale:* {channel}")
+            lines.append(f"📢 *{get('main.channel')}:* {channel}")
         
         if config.get("INCLUDE_SENDER", True) and sender:
-            lines.append(f"👤 *Mittente:* {sender}")
+            lines.append(f"👤 *{get('main.sender')}:* {sender}")
             
         if config.get("INCLUDE_MESSAGE", True) and message_text:
-            lines.append(f"💬 *Messaggio:*\n{message_text}")
+            lines.append(f"💬 *{get('main.message')}:*\n{message_text}")
         
     message = "\n".join(lines)
 

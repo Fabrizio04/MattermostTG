@@ -22,7 +22,13 @@
         "no": "No",
         "save": "Salva",
         "discard": "Scarta",
-        "cancel": "Annulla"
+        "cancel": "Annulla",
+        "date": "Data",
+        "date_format": "%d/%m/%Y - %H:%M",
+        "channel": "Canale",
+        "sender": "Mittente",
+        "message": "Messaggio",
+        "default_msg": "Hai ricevuto un nuovo messaggio!"
     },
     "settings": {
         "title": "Impostazioni - Mattermost Notifier",
@@ -253,7 +259,8 @@
             "error_fs_save": "Errore durante il salvataggio della chiave AES su file:",
             "error_save_keyring": "Salvataggio chiave AES nel keyring fallito:",
             "error_key_unavailable": "Chiave AES non disponibile",
-            "error_execution": "Errore nell'esecuzione AES:"
+            "error_execution": "Errore nell'esecuzione AES:",
+            "error_decrypter": "Errore nell'elaborazione del decrypter:"
         },
         "fetch_user_id": {
             "user_id": "User ID recuperato con successo dall'API:",
@@ -285,6 +292,10 @@
         "logviewer": {
             "read_error": "Errore durante la lettura del file di log:",
             "clear": "File di log svuotato dall'utente."
+        },
+        "http_server": {
+            "start": "Server HTTP avviato sulla porta {port}",
+            "stop": "Server HTTP terminato"
         }
     },
     "args": {
@@ -294,9 +305,49 @@
         "open_settings": "Avvia l'applicazione in modalità try-icon e apre subito le impostazioni.",
         "headless": "Avvia l'applicazione in modalità headless (no GUI).",
         "port": "Porta TCP per il server HTTP di controllo/status (default: 8080).",
+        "http_user": "Username per autenticazione basica per il server HTTP",
+        "http_pass": "Password per autenticazione basica per il server HTTP",
         "config": "Percorso del file di configurazione JSON.",
         "aes_key": "Chiave privata (AES-256) in formato HEX.",
         "log_level": "Livello logging (default INFO).",
         "lang": "Imposta la lingua (formato BCP 47)."
+    },
+    "openapi": {
+        "description": "API di controllo e monitoraggio in modalità headless.",
+        "status": {
+            "summary": "Stati dei servizi",
+            "responses": "JSON stati"
+        },
+        "config": {
+            "get": {
+                "summary": "Ottieni la configurazione corrente",
+                "responses": "JSON configurazione"
+            },
+            "put": {
+                "summary": "Aggiorna la configurazione in-memory",
+                "responses": "Aggiornamento in-memory effettuato"
+            }
+        },
+        "notify_service": {
+            "summary": "Inverte lo stato delle notifiche del service (On/Off)",
+            "responses": "Stato modificato con successo"
+        },
+        "decrypter": {
+            "summary": "Ottieni la pagina HTML del decrypter",
+            "includeKey": "Imposta a true per includere la chiave AES",
+            "responses": "Pagina HTML"
+        }
+    },
+    "decrypter": {
+        "key": "Chiave AES-256 (Hex 64 caratteri)",
+        "upload": "Carica",
+        "payload": "Messaggio",
+        "placeholder": "Incolla qui il testo ricevuto…",
+        "btn_decrypt": "Decifra Messaggio",
+        "message": "Messaggio in Chiaro",
+        "btn_copy": "Copia Messaggio",
+        "error": "Errore nella decifrazione! Verifica la chiave o il messaggio.",
+        "copied": "Copiato negli appunti!",
+        "error_copy": "Impossibile copiare il testo."
     }
 }

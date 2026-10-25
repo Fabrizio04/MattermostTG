@@ -29,19 +29,19 @@ Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed e
 
 ```
 MattermostTG/
-├── aes/
-    └── decrypter.html             # Webapp per decifrazione AES-256
 ├── func/
     ├── aes.py                     # Gestione crittografia AES-256
     ├── check_auto_startup.py      # Funzione per verifica auto startup
     ├── check_on_close.py          # Funzione per controllo modifiche
     ├── create_toggle_row.py       # Funzione per creazione toggle row
+    ├── decrypter.py               # Funzione per formattazione decrypter
     ├── fetch_user_id.py           # Funzione per salvataggio id utente
     ├── format_notification.py     # Funzione per formattazione notifica
     ├── get_system_locale.py       # Funzione per localizzazione corrente
     ├── i18n.py                    # Gestione localizzazione applicazione
     ├── message_queue.py           # Gestione retry e coda di invio
     ├── message.py                 # Invio chiamate API verso Telegram
+    ├── openapi.py                 # Configurazione per Swagger UI
     ├── parse_args.py              # Funzione per gestione args ed envs
     ├── theme.py                   # Gestione tema e stili applicazione
     ├── utils.py                   # Gestione percorsi risorse e icone
@@ -71,6 +71,11 @@ MattermostTG/
     ├── TimeoutSettingsDialog.py   # Interfaccia GUI per i parametri timeout
     ├── ToggleSwitch.py            # Componente GUI toggle switch
     └── WSStatusBridge.py          # Componente GUI bridge di comunicazione
+├── web/
+    ├── decrypter.html             # Webapp per decifrazione AES-256
+    ├── docs.html                  # Swagger UI per modalità headless
+    └── index.html                 # Pagina default modalità headless
+├── HeadlessHTTPServer.py          # Servizio HTTP per modalità headless
 ├── logger.py                      # Sistema di logging centralizzato
 ├── mattermost_listener.py         # Gestione ciclo eventi WebSocket asyncio
 ├── mattermost_notifier.py         # Entry point dell'applicazione
@@ -126,13 +131,13 @@ MattermostTG/
 ### 🪟 Windows (.exe)
 
 ```bash
-py -m PyInstaller --noconsole --onefile --add-data "img;img" --add-data "aes;aes" --add-data "i18n;i18n" --icon="img/icon_active.ico" --name="MattermostNotifier-Win" mattermost_notifier.py
+py -m PyInstaller --noconsole --onefile --add-data "img;img" --add-data "web;web" --add-data "i18n;i18n" --icon="img/icon_active.ico" --name="MattermostNotifier-Win" mattermost_notifier.py
 ```
 
 ### 🐧 Linux (Binary ELF)
 
 ```bash
-pyinstaller --noconsole --onefile --add-data "img:img" --add-data "aes:aes" --add-data "i18n:i18n" --name "MattermostNotifier-Linux" mattermost_notifier.py
+pyinstaller --noconsole --onefile --add-data "img:img" --add-data "web:web" --add-data "i18n:i18n" --name "MattermostNotifier-Linux" mattermost_notifier.py
 ```
 
 Per una guida dettagliata all'installazione permanente e all'integrazione nel menu di sistema su distribuzioni Linux, consulta la [Guida Linux](doc/LINUX_DEPLOY.md).
@@ -140,7 +145,7 @@ Per una guida dettagliata all'installazione permanente e all'integrazione nel me
 ### 🍏 macOS (Binary Executable)
 
 ```bash
-pyinstaller --noconsole --onefile --add-data "img:img" --add-data "aes:aes" --add-data "i18n:i18n" --name "MattermostNotifier-macOS" mattermost_notifier.py
+pyinstaller --noconsole --onefile --add-data "img:img" --add-data "web:web" --add-data "i18n:i18n" --name "MattermostNotifier-macOS" mattermost_notifier.py
 ```
 
 Troverai il file eseguibile compilato all'interno della cartella `dist/`.

@@ -22,7 +22,7 @@ from settings import (
 
 from logger import log
 
-from func.utils import resource_path
+from func.decrypter import get_decrypter
 from func.i18n import get, load_language
 from func.aes import get_or_create_aes_key
 from func.check_on_close import check_on_close
@@ -442,22 +442,13 @@ class SettingsDialog(QDialog):
     def download_decrypter_html(self, includeKey):
 
         overlay = None
-        template_path = resource_path(os.path.join("aes", "decrypter.html"))
+        html_content = get_decrypter(includeKey)
         
-        if not os.path.exists(template_path):
+        if html_content == "NF":
             CustomMessageBox.show_warning(self, get("settings.aes.decrypter.warning.title"), get("settings.aes.decrypter.warning.message"))
             return
 
         try:
-            with open(template_path, "r", encoding="utf-8") as f:
-                html_content = f.read()
-
-            chiave_esempio = "===MY_PRIVATE_KEY==="
-            if chiave_esempio in html_content:
-                html_content = html_content.replace(chiave_esempio, get_or_create_aes_key() if includeKey == True else "")
-            else:
-                pass
-
             overlay = get_overlay(self)
             
             file_path, _ = QFileDialog.getSaveFileName(

@@ -22,7 +22,13 @@
         "no": "No",
         "save": "Save",
         "discard": "Discard",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "date": "Date",
+        "date_format": "%Y/%m/%d - %H:%M",
+        "channel": "Channel",
+        "sender": "Sender",
+        "message": "Message",
+        "default_msg": "You've received a new message!"
     },
     "settings": {
         "title": "Settings - Mattermost Notifier",
@@ -253,7 +259,8 @@
             "error_fs_save": "Error while saving the AES key to file:",
             "error_save_keyring": "Saving AES key to keyring failed:",
             "error_key_unavailable": "AES key not available",
-            "error_execution": "Error during AES execution:"
+            "error_execution": "Error during AES execution:",
+            "error_decrypter": "Error while processing decrypter:"
         },
         "fetch_user_id": {
             "user_id": "User ID successfully retrieved from the API:",
@@ -285,6 +292,10 @@
         "logviewer": {
             "read_error": "Error reading log file:",
             "clear": "Log file cleared by the user."
+        },
+        "http_server": {
+            "start": "HTTP server started on port {port}",
+            "stop": "HTTP server stopped"
         }
     },
     "args": {
@@ -294,9 +305,49 @@
         "open_settings": "Launches the application in tray-icon mode and immediately opens the settings.",
         "headless": "Launch the application in headless mode (no GUI).",
         "port": "TCP port for the control/status HTTP server (default: 8080).",
+        "http_user": "Username for basic authentication for the HTTP server",
+        "http_pass": "Password for basic authentication for the HTTP server",
         "config": "JSON configuration file path.",
         "aes_key": "Private key (AES-256) in HEX format.",
         "log_level": "Logging level (default INFO).",
         "lang": "Set the language (BCP 47 format)."
+    },
+    "openapi": {
+        "description": "Headless control and monitoring APIs.",
+        "status": {
+            "summary": "Service statuses",
+            "responses": "States JSON"
+        },
+        "config": {
+            "get": {
+                "summary": "Get the current configuration",
+                "responses": "Configuration JSON"
+            },
+            "put": {
+                "summary": "Update the in-memory configuration",
+                "responses": "In-memory update performed"
+            }
+        },
+        "notify_service": {
+            "summary": "Toggles the service notification state (On/Off)",
+            "responses": "Status successfully modified"
+        },
+        "decrypter": {
+            "summary": "Get the decrypter HTML page",
+            "includeKey": "Set to true to include the AES key",
+            "responses": "HTML WebPage"
+        }
+    },
+    "decrypter": {
+        "key": "AES-256 key (64-character hex)",
+        "upload": "Upload",
+        "payload": "Message",
+        "placeholder": "Paste text received here…",
+        "btn_decrypt": "Decrypt Message",
+        "message": "Clear-text Message",
+        "btn_copy": "Copy Message",
+        "error": "Error during decryption! Check key or message.",
+        "copied": "Copied to clipboard!",
+        "error_copy": "Unable to copy text."
     }
 }

@@ -81,6 +81,9 @@ def load_settings(args = None):
             config["TG_HTTP_TIMEOUT"] = args.tg_http_val
             config["LOG_LEVEL"] = args.log_level
             config["LANGUAGE"] = args.lang
+            config["PORT"] = args.port
+            config["HTTP_USER"] = args.http_user
+            config["HTTP_PASS"] = args.http_pass
         else:
             _load_custom(args.config)
     else:

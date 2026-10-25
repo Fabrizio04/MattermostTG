@@ -16,6 +16,7 @@ from func.theme import get_stylesheet
 from func.parse_args import parse_args
 
 from MattermostApp import MattermostApp
+from HeadlessHTTPServer import HeadlessHTTPServer
 
 from PyQt6.QtCore import QLockFile, QDir, QTimer
 
@@ -56,6 +57,7 @@ def main():
         from func.message_queue import start_retry_worker
         threading.Thread(target=mattermost_listener.run_websocket_loop, daemon=True).start()
         start_retry_worker()
+        threading.Thread(target=HeadlessHTTPServer.run_http_server, daemon=True).start()
         log.info(get("log.service.started"))
     else:
         app.setQuitOnLastWindowClosed(False)
@@ -75,21 +77,21 @@ def main():
             mattermost_listener.running = False
             from func.message_queue import stop_retry_worker
             stop_retry_worker()
+            HeadlessHTTPServer.stop_http_server()
             log.info(get("log.service.ended"))
 
         app.quit()
 
-    # Ctrl+C (SIGINT)
     def sigint_handler(signum, frame):
         shutdown_gracefully()
 
     signal.signal(signal.SIGINT, sigint_handler)
+    signal.signal(signal.SIGTERM, sigint_handler)
 
     timer = QTimer()
     timer.timeout.connect(lambda: None)
     timer.start(500)
 
-    # Avvio pulito
     sys.exit(app.exec())
 
 if __name__ == "__main__":
