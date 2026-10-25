@@ -33,7 +33,7 @@ jobs:
     - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install PyQt6 websockets requests keyring pyinstaller
+        pip install PyQt6 websockets requests keyring cryptography pyinstaller
 
     - name: Build Executable (Windows)
       if: runner.os == 'Windows'
