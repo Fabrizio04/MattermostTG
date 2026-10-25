@@ -153,7 +153,7 @@ class LogViewerDialog(QDialog):
                         self.last_file_pos = f.tell()
                         QTimer.singleShot(10, self.scroll_to_bottom)
             except Exception as e:
-                log.error(f"{get("log.logviewer.read_error")} {e}")
+                log.error(f"{get('log.logviewer.read_error')} {e}")
 
     def scroll_to_bottom(self):
         """Funzione di supporto per portare lo scroll in fondo."""

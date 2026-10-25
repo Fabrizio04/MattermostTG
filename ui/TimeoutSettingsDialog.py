@@ -44,7 +44,7 @@ class TimeoutSettingsDialog(QDialog):
 
         # Timeout Listener WebSocket
         self.ws_timeout_spin = QSpinBox()
-        self.ws_timeout_spin.setStyleSheet(f"background-color: {theme["input_bg"]};color: {theme["input_fg"]};")
+        self.ws_timeout_spin.setStyleSheet(f"background-color: {theme['input_bg']};color: {theme['input_fg']};")
         self.ws_timeout_spin.setRange(1, 300)
         self.ws_timeout_spin.setSuffix(" s")
         self.ws_timeout_spin.setValue(int(config.get("WS_RECONNECT_TIMEOUT", 5)))
@@ -52,7 +52,7 @@ class TimeoutSettingsDialog(QDialog):
 
         # Timeout Retry Logic (Coda di invio)
         self.retry_timeout_spin = QSpinBox()
-        self.retry_timeout_spin.setStyleSheet(f"background-color: {theme["input_bg"]};color: {theme["input_fg"]};")
+        self.retry_timeout_spin.setStyleSheet(f"background-color: {theme['input_bg']};color: {theme['input_fg']};")
         self.retry_timeout_spin.setRange(1, 300)
         self.retry_timeout_spin.setSuffix(" s")
         self.retry_timeout_spin.setValue(int(config.get("RETRY_LOGIC_TIMEOUT", 10)))
@@ -60,14 +60,14 @@ class TimeoutSettingsDialog(QDialog):
 
         # Max Tentativi
         self.max_attempts_spin = QSpinBox()
-        self.max_attempts_spin.setStyleSheet(f"background-color: {theme["input_bg"]};color: {theme["input_fg"]};")
+        self.max_attempts_spin.setStyleSheet(f"background-color: {theme['input_bg']};color: {theme['input_fg']};")
         self.max_attempts_spin.setRange(1, 50)
         self.max_attempts_spin.setValue(int(config.get("RETRY_LOGIC_MAX_ATTEMPTS", 5)))
         form_layout.addRow(get("timeout.field3"), self.max_attempts_spin)
 
         # Timeout http client telegram
         self.timeout_http_tg = QSpinBox()
-        self.timeout_http_tg.setStyleSheet(f"background-color: {theme["input_bg"]};color: {theme["input_fg"]};")
+        self.timeout_http_tg.setStyleSheet(f"background-color: {theme['input_bg']};color: {theme['input_fg']};")
         self.timeout_http_tg.setRange(1, 300)
         self.timeout_http_tg.setSuffix(" s")
         self.timeout_http_tg.setValue(int(config.get("TG_HTTP_TIMEOUT", 5)))

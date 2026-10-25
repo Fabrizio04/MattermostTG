@@ -14,8 +14,10 @@
         "exit": "Exit"
     },
     "main": {
+        "headless": "Starting application in headless mode (no GUI)...",
         "lock_title": "Application already running",
         "lock_message": "Mattermost Notifier is already active in the system tray area.",
+        "lock_headless_msg": "Cannot start: another instance is already running.",
         "yes": "Yes",
         "no": "No",
         "save": "Save",
@@ -246,7 +248,11 @@
             "error_regedit": "Windows automatic startup management error:"
         },
         "aes": {
+            "error_fs_read": "Error while reading the AES key from file:",
+            "key_saved": "AES key successfully generated and saved to the filesystem.",
+            "error_fs_save": "Error while saving the AES key to file:",
             "error_save_keyring": "Saving AES key to keyring failed:",
+            "error_key_unavailable": "AES key not available",
             "error_execution": "Error during AES execution:"
         },
         "fetch_user_id": {
@@ -280,5 +286,17 @@
             "read_error": "Error reading log file:",
             "clear": "Log file cleared by the user."
         }
+    },
+    "args": {
+        "description": "Mattermost Notifier - Cross-platform, headless notification utility.",
+        "env": "Environment variables (ENV) supported as an alternative to arguments:",
+        "help": "Show the guide.",
+        "open_settings": "Launches the application in tray-icon mode and immediately opens the settings.",
+        "headless": "Launch the application in headless mode (no GUI).",
+        "port": "TCP port for the control/status HTTP server (default: 8080).",
+        "config": "JSON configuration file path.",
+        "aes_key": "Private key (AES-256) in HEX format.",
+        "log_level": "Logging level (default INFO).",
+        "lang": "Set the language (BCP 47 format)."
     }
 }

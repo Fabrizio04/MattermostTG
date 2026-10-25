@@ -366,7 +366,7 @@ class SettingsDialog(QDialog):
                 else:
                     CustomMessageBox.show_warning(self, get("settings.export.warning.title"), get("settings.export.warning.message"))
             except Exception as e:
-                CustomMessageBox.show_critical(self, get("settings.export.critical.title"), f"{get("settings.export.critical.message")} {e}")
+                CustomMessageBox.show_critical(self, get("settings.export.critical.title"), f"{get('settings.export.critical.message')} {e}")
 
         if overlay:
             overlay.deleteLater()
@@ -405,7 +405,7 @@ class SettingsDialog(QDialog):
                 
                 CustomMessageBox.show_info(self, get("settings.import.info.title"), get("settings.import.info.message"))
             except Exception as e:
-                CustomMessageBox.show_critical(self, get("settings.import.critical.title"), f"{get("settings.import.critical.message")} {e}")
+                CustomMessageBox.show_critical(self, get("settings.import.critical.title"), f"{get('settings.import.critical.message')} {e}")
 
         if overlay:
             overlay.deleteLater()
@@ -421,12 +421,12 @@ class SettingsDialog(QDialog):
                 get_or_create_aes_key()
                 CustomMessageBox.show_info(self, get("settings.aes.regeneration.info.title"), get("settings.aes.regeneration.info.message"))
             except Exception as e:
-                CustomMessageBox.show_critical(self, get("settings.aes.regeneration.critical.title"), f"{get("settings.aes.regeneration.critical.message")} {e}")
+                CustomMessageBox.show_critical(self, get("settings.aes.regeneration.critical.title"), f"{get('settings.aes.regeneration.critical.message')} {e}")
 
     def download_raw_key(self):
         user_key = get_or_create_aes_key()
         overlay = get_overlay(self)
-        file_path, _ = QFileDialog.getSaveFileName(self, get("settings.aes.key.caption"), f"{get("settings.aes.key.filename")}.txt", "Text Files (*.txt)")
+        file_path, _ = QFileDialog.getSaveFileName(self, get("settings.aes.key.caption"), f"{get('settings.aes.key.filename')}.txt", "Text Files (*.txt)")
         if file_path:
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(user_key)
@@ -463,17 +463,17 @@ class SettingsDialog(QDialog):
             file_path, _ = QFileDialog.getSaveFileName(
                 self,
                 get("settings.aes.decrypter.caption"),
-                f"{get("settings.aes.decrypter.filename")}.html",
+                f"{get('settings.aes.decrypter.filename')}.html",
                 "File HTML (*.html)"
             )
 
             if file_path:
                 with open(file_path, "w", encoding="utf-8") as f:
                     f.write(html_content)
-                CustomMessageBox.show_info(self, get("settings.aes.decrypter.info.title"), f"{get("settings.aes.decrypter.info.message")}\n{file_path}")
+                CustomMessageBox.show_info(self, get("settings.aes.decrypter.info.title"), f"{get('settings.aes.decrypter.info.message')}\n{file_path}")
 
         except Exception as e:
-            CustomMessageBox.show_critical(self, get("settings.aes.decrypter.critical.title"), f"{get("settings.aes.decrypter.critical.message")} {e}")
+            CustomMessageBox.show_critical(self, get("settings.aes.decrypter.critical.title"), f"{get('settings.aes.decrypter.critical.message')} {e}")
 
         if overlay:
             overlay.deleteLater()
@@ -525,7 +525,7 @@ class SettingsDialog(QDialog):
                         pass
                 reg.CloseKey(key)
             except Exception as e:
-                log.error(f"{get("log.settings.error_regedit")} {e}")
+                log.error(f"{get('log.settings.error_regedit')} {e}")
 
         elif sys.platform.startswith("linux"):
             autostart_dir = Path.home() / ".config" / "autostart"
@@ -629,7 +629,7 @@ Terminal=false
                 try:
                     os.remove(CONFIG_FILE_PATH)
                 except Exception as e:
-                    log.error(f"{get("log.settings.error_reset")} {e}")
+                    log.error(f"{get('log.settings.error_reset')} {e}")
             
             try:
                 keyring.delete_password(APP_NAME, "MATTERMOST_TOKEN")

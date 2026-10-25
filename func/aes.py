@@ -1,23 +1,61 @@
 import os
+import sys
 import base64
 import keyring
 
 from logger import log
 from func.i18n import get
-from settings import APP_NAME, config
+from settings import APP_NAME, APP_DIR, config
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-def get_or_create_aes_key():
-    key_hex = keyring.get_password(APP_NAME, "AES_ENCRYPTION_KEY")
+CONFIG_FILE_PATH = os.path.join(APP_DIR, "mattermosttg.json")
 
-    if not key_hex:
-        key_bytes = os.urandom(32)
-        key_hex = key_bytes.hex()
+def _new_fs_key():
+    key_path = os.path.join(APP_DIR, f"{get('settings.aes.key.filename')}.txt")
+    
+    if os.path.exists(key_path):
         try:
-            keyring.set_password(APP_NAME, "AES_ENCRYPTION_KEY", key_hex)
+            with open(key_path, "r", encoding="utf-8") as f:
+                key_hex = f.read().strip()
+                if key_hex:
+                    return key_hex
         except Exception as e:
-            log.error(f"{get("log.aes.error_save_keyring")} {e}")
+            log.error(f"{get('log.aes.error_fs_read')} {e}")
+
+    key_bytes = os.urandom(32)
+    key_hex = key_bytes.hex()
+
+    try:
+        with open(key_path, "w", encoding="utf-8") as f:
+            f.write(key_hex)
+        log.debug(get("log.aes.key_saved"))
+    except Exception as e:
+        log.error(f"{get('log.aes.error_fs_save')} {e}")
+
     return key_hex
+
+def get_or_create_aes_key():
+
+    is_headless = "--headless" in sys.argv or os.getenv("HEADLESS", "false").lower() == "true"
+
+    if is_headless:
+        aes_key = config.get("AES_ENCRYPTION_KEY", "").strip()
+
+        if aes_key:
+            return aes_key
+        else:
+            return _new_fs_key()
+    else:
+        key_hex = keyring.get_password(APP_NAME, "AES_ENCRYPTION_KEY")
+
+        if not key_hex:
+            key_bytes = os.urandom(32)
+            key_hex = key_bytes.hex()
+            try:
+                keyring.set_password(APP_NAME, "AES_ENCRYPTION_KEY", key_hex)
+            except Exception as e:
+                log.error(f"{get('log.aes.error_save_keyring')} {e}")
+        return key_hex
 
 def aes(payload):
 
@@ -28,7 +66,7 @@ def aes(payload):
         CHIAVE_HEX = get_or_create_aes_key()
 
         if not CHIAVE_HEX:
-            raise Exception("Chiave AES non disponibile")
+            raise Exception(get("log.aes.error_key_unavailable"))
 
         chiave = bytes.fromhex(CHIAVE_HEX)
 
@@ -42,5 +80,5 @@ def aes(payload):
         return f"`{payload_base64}`"
 
     except Exception as e:
-        log.error(f"{get("log.aes.error_execution")} {e}")
+        log.error(f"{get('log.aes.error_execution')} {e}")
         return ""

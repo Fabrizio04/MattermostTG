@@ -51,16 +51,20 @@ def _loadFile(lang_file):
             metadata = data.get("_metadata", {})
             translations = data
     except Exception as e:
-        log.error(f"{get("log.i18n.error").format(lang_file=lang_file)} {e}")
+        log.error(f"{get('log.i18n.error').format(lang_file=lang_file)} {e}")
         translations = {}
         metadata = {}
 
 def get(key_path, default="None"):
     global translations
+
+    if not bool(translations):
+        load_language()
+
     keys = key_path.split(".")
     val = translations
     for k in keys:
-        if isinstance(translations, dict) and k in val:
+        if isinstance(val, dict) and k in val:
             val = val[k]
         else:
             return default

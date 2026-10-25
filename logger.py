@@ -15,15 +15,69 @@ LOG_FILE_PATH = os.path.join(APP_DIR, "mattermosttg.log")
 CONFIG_FILE_PATH = os.path.join(APP_DIR, "mattermosttg.json")
 
 def get_initial_log_level():
-    """Legge direttamente il livello di log dal JSON salvato, se esiste."""
+    """
+    Determina il livello di log iniziale:
+    - Se headless:
+        1. Cerca un file di configurazione custom (--config o ENV CONFIG_PATH).
+        2. Se assente, cerca --log-level da CLI.
+        3. Se assente, cerca nella ENV (LOG_LEVEL).
+    - Se non headless (GUI):
+        - Legge direttamente dal file di configurazione standard JSON (CONFIG_FILE_PATH).
+    - Fallback finale: "INFO".
+    """
 
-    if os.path.exists(CONFIG_FILE_PATH):
+    is_headless = "--headless" in sys.argv or os.getenv("HEADLESS", "false").lower() == "true"
+
+    if is_headless:
+        custom_config = None
         try:
-            with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                return data.get("LOG_LEVEL", "INFO").upper()
+            if "--config" in sys.argv:
+                idx = sys.argv.index("--config")
+                if idx + 1 < len(sys.argv):
+                    custom_config = sys.argv[idx + 1]
         except Exception:
             pass
+
+        if not custom_config:
+            custom_config = os.getenv("CONFIG_PATH", "")
+
+        if custom_config:
+            try:
+                if os.path.exists(custom_config):
+                    with open(custom_config, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        if "LOG_LEVEL" in data:
+                            return data["LOG_LEVEL"].upper()
+                elif os.path.exists(CONFIG_FILE_PATH):
+                    with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        if "LOG_LEVEL" in data:
+                            return data["LOG_LEVEL"].upper()
+            except Exception:
+                pass
+
+        try:
+            if "--log-level" in sys.argv:
+                idx = sys.argv.index("--log-level")
+                if idx + 1 < len(sys.argv):
+                    cli_level = sys.argv[idx + 1]
+                    if cli_level:
+                        return cli_level.upper()
+        except Exception:
+            pass
+
+        env_level = os.getenv("LOG_LEVEL", "")
+        if env_level:
+            return env_level.upper()
+        
+    else:
+        if os.path.exists(CONFIG_FILE_PATH):
+            try:
+                with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    return data.get("LOG_LEVEL", "INFO").upper()
+            except Exception:
+                pass
 
     return "INFO"
 

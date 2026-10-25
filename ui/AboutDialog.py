@@ -45,16 +45,16 @@ class AboutDialog(QDialog):
         layout.addWidget(lbl_title)
 
         # Versione
-        lbl_version = QLabel(f"{get("about.version")} 1.1.0 (Cross-Platform)")
+        lbl_version = QLabel(f"{get('about.version')} 1.1.0 (Cross-Platform)")
         lbl_version.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(lbl_version)
 
         # Descrizione / Credits
         info_text = (
-            f"{get("about.created")} Fabrizio\n"
-            f"{get("about.license")}: Open Source (MIT)\n\n"
-            f"{get("about.desc1")}\n"
-            f"{get("about.desc2")}"
+            f"{get('about.created')} Fabrizio\n"
+            f"{get('about.license')}: Open Source (MIT)\n\n"
+            f"{get('about.desc1')}\n"
+            f"{get('about.desc2')}"
         )
         lbl_info = QLabel(info_text)
         lbl_info.setAlignment(Qt.AlignmentFlag.AlignCenter)

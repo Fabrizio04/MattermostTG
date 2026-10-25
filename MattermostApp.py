@@ -70,15 +70,15 @@ class MattermostApp:
         self.action_settings.setText(get("tray.settings"))
         self.action_quit.setText(get("tray.exit"))
         if mattermost_listener.is_websocket_connected():
-            self.tray_ws_action.setText(f"🟢 {get("tray.status_connected")}")
+            self.tray_ws_action.setText(f"🟢 {get('tray.status_connected')}")
         else:
-            self.tray_ws_action.setText(f"🔴 {get("tray.status_disconnected")}")
+            self.tray_ws_action.setText(f"🔴 {get('tray.status_disconnected')}")
 
     def update_tray_ws_status(self, is_connected: bool):
         if is_connected:
-            self.tray_ws_action.setText(f"🟢 {get("tray.status_connected")}")
+            self.tray_ws_action.setText(f"🟢 {get('tray.status_connected')}")
         else:
-            self.tray_ws_action.setText(f"🔴 {get("tray.status_disconnected")}")
+            self.tray_ws_action.setText(f"🔴 {get('tray.status_disconnected')}")
 
     def toggle_service(self, checked):
         mattermost_listener.service_active = checked

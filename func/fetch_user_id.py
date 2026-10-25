@@ -21,7 +21,7 @@ def fetch_user_id(ws_url, token):
         if response.status_code == 200:
             user_data = response.json()
             uid = user_data.get("id")
-            log.debug(f"{get("log.fetch_user_id.user_id")} {uid}")
+            log.debug(f"{get('log.fetch_user_id.user_id')} {uid}")
             return uid
         else:
             log.error(get("log.fetch_user_id.http_error").format(status_code=response.status_code))

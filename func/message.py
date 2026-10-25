@@ -32,10 +32,10 @@ def send_telegram(text: str, is_retry: bool = False) -> bool:
             log.info(get("log.message.notify_sent"))
             return True
         else:
-            log.error(f"{get("log.message.http_error")} {response.status_code}: {response.text}")
+            log.error(f"{get('log.message.http_error')} {response.status_code}: {response.text}")
         
     except Exception as e:
-        log.error(f"{get("log.message.error")} {e}")
+        log.error(f"{get('log.message.error')} {e}")
 
     if not is_retry:
         enqueue_failed_message(text)

@@ -17,6 +17,9 @@ dist/
 mattermosttg.json
 mattermosttg.log
 
+# Docker
+data/
+
 # IDE & Editor Settings
 .vscode/
 .idea/

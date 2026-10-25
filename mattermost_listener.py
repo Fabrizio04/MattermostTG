@@ -85,7 +85,7 @@ async def mattermost_listener():
                         create_at_ms = post_data.get("create_at")
                                                 
                         notification_msg = format_notification(create_at_ms, channel_display_name, sender_name, message_text)
-                        log.debug(f"{get("log.listener.formatted_message")} {notification_msg}")
+                        log.debug(f"{get('log.listener.formatted_message')} {notification_msg}")
 
                         if not notification_msg:
                             log.warning(get("log.listener.invalid_formatting"))

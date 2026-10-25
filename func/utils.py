@@ -36,5 +36,5 @@ def get_tray_icon(active=True):
         return QIcon(path)
     else:
         from func.i18n import get
-        log.warning(f"{get("log.utils.ico_nf")} {path}")
+        log.warning(f"{get('log.utils.ico_nf')} {path}")
         return QIcon()

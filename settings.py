@@ -39,25 +39,60 @@ config = {
     "LANGUAGE": get_system_locale()
 }
 
-def load_settings():
+def _load(file_path):
     global config
-    if os.path.exists(CONFIG_FILE_PATH):
+    
+    if os.path.exists(file_path):
         try:
-            with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 saved_data = json.load(f)
                 config.update(saved_data)
         except Exception as e:
             from func.i18n import get
-            log.error(f"{get("log.settings.error_load")} {e}")
+            log.error(f"{get('log.settings.error_load')} {e}")
 
-    try:
-        config["MATTERMOST_TOKEN"] = keyring.get_password(APP_NAME, "MATTERMOST_TOKEN") or ""
-        config["TELEGRAM_BOT_TOKEN"] = keyring.get_password(APP_NAME, "TELEGRAM_BOT_TOKEN") or ""
-    except (KeyringError, Exception) as e:
-        from func.i18n import get
-        log.error(f"{get("log.settings.error_keyring")} {e}")
-        config["MATTERMOST_TOKEN"] = config.get("MATTERMOST_TOKEN", "")
-        config["TELEGRAM_BOT_TOKEN"] = config.get("TELEGRAM_BOT_TOKEN", "")
+def _load_custom(file_path):
+    if not os.path.exists(file_path):
+        _load(CONFIG_FILE_PATH)
+    else:
+        _load(file_path)
+
+def load_settings(args = None):
+    global config
+
+    if args and args.headless:
+        if args.config == "":
+            config["MATTERMOST_WS_URL"] = args.ws_url
+            config["MATTERMOST_TOKEN"] = args.token
+            config["TELEGRAM_BOT_TOKEN"] = args.bot_token
+            config["TELEGRAM_CHAT_ID"] = args.chat_id
+            config["EXCLUDED_SENDERS"] = args.excluded_senders
+            config["EXCLUDED_CHANNELS"] = args.excluded_channels
+            config["ECHO_SUPPRESSION_ENABLED"] = args.echo_suppression
+            config["ANONYMOUS_MODE"] = args.anonymous_mode
+            config["INCLUDE_SENDER"] = args.include_sender
+            config["INCLUDE_CHANNEL"] = args.include_channel
+            config["INCLUDE_MESSAGE"] = args.include_message
+            config["AES_ENCRYPTION_ENABLED"] = args.aes_enabled
+            config["AES_ENCRYPTION_KEY"] = args.aes_key
+            config["WS_RECONNECT_TIMEOUT"] = args.ws_val
+            config["RETRY_LOGIC_TIMEOUT"] = args.retry_val
+            config["RETRY_LOGIC_MAX_ATTEMPTS"] = args.attempts_val
+            config["TG_HTTP_TIMEOUT"] = args.tg_http_val
+            config["LOG_LEVEL"] = args.log_level
+            config["LANGUAGE"] = args.lang
+        else:
+            _load_custom(args.config)
+    else:
+        _load(CONFIG_FILE_PATH)
+        try:
+            config["MATTERMOST_TOKEN"] = keyring.get_password(APP_NAME, "MATTERMOST_TOKEN") or ""
+            config["TELEGRAM_BOT_TOKEN"] = keyring.get_password(APP_NAME, "TELEGRAM_BOT_TOKEN") or ""
+        except (KeyringError, Exception) as e:
+            from func.i18n import get
+            log.error(f"{get('log.settings.error_keyring')} {e}")
+            config["MATTERMOST_TOKEN"] = config.get("MATTERMOST_TOKEN", "")
+            config["TELEGRAM_BOT_TOKEN"] = config.get("TELEGRAM_BOT_TOKEN", "")
 
 def reset_settings():
     global config
@@ -133,11 +168,11 @@ def save_settings(ws_url, mm_token, tg_token, tg_chat_id, excluded_senders, excl
         log.debug(get("log.settings.saved"))
     except Exception as e:
         from func.i18n import get
-        log.error(f"{get("log.settings.error_save_settings")} {e}")
+        log.error(f"{get('log.settings.error_save_settings')} {e}")
 
     try:
         keyring.set_password(APP_NAME, "MATTERMOST_TOKEN", mm_token)
         keyring.set_password(APP_NAME, "TELEGRAM_BOT_TOKEN", tg_token)
     except (KeyringError, Exception) as e:
         from func.i18n import get
-        log.error(f"{get("log.settings.error_save_keyring")} {e}")
+        log.error(f"{get('log.settings.error_save_keyring')} {e}")

@@ -14,8 +14,10 @@
         "exit": "Esci"
     },
     "main": {
+        "headless": "Avvio dell'applicazione in modalità headless (no GUI)...",
         "lock_title": "Applicazione già in esecuzione",
         "lock_message": "Mattermost Notifier è già attivo nella tray area del sistema in uso.",
+        "lock_headless_msg": "Impossibile avviare: un'altra istanza è già in esecuzione.",
         "yes": "Sì",
         "no": "No",
         "save": "Salva",
@@ -246,7 +248,11 @@
             "error_regedit": "Errore gestione avvio automatico Windows:"
         },
         "aes": {
+            "error_fs_read": "Errore durante la lettura della chiave AES da file:",
+            "key_saved": "Chiave AES generata e salvata con successo su filesystem.",
+            "error_fs_save": "Errore durante il salvataggio della chiave AES su file:",
             "error_save_keyring": "Salvataggio chiave AES nel keyring fallito:",
+            "error_key_unavailable": "Chiave AES non disponibile",
             "error_execution": "Errore nell'esecuzione AES:"
         },
         "fetch_user_id": {
@@ -280,5 +286,17 @@
             "read_error": "Errore durante la lettura del file di log:",
             "clear": "File di log svuotato dall'utente."
         }
+    },
+    "args": {
+        "description": "Mattermost Notifier - Utility di notifica cross-platform e headless.",
+        "env": "Variabili d'ambiente (ENV) supportate come alternativa agli argomenti:",
+        "help": "Mostra la guida.",
+        "open_settings": "Avvia l'applicazione in modalità try-icon e apre subito le impostazioni.",
+        "headless": "Avvia l'applicazione in modalità headless (no GUI).",
+        "port": "Porta TCP per il server HTTP di controllo/status (default: 8080).",
+        "config": "Percorso del file di configurazione JSON.",
+        "aes_key": "Chiave privata (AES-256) in formato HEX.",
+        "log_level": "Livello logging (default INFO).",
+        "lang": "Imposta la lingua (formato BCP 47)."
     }
 }

@@ -42,6 +42,7 @@ MattermostTG/
     ├── i18n.py                    # Gestione localizzazione applicazione
     ├── message_queue.py           # Gestione retry e coda di invio
     ├── message.py                 # Invio chiamate API verso Telegram
+    ├── parse_args.py              # Funzione per gestione args ed envs
     ├── theme.py                   # Gestione tema e stili applicazione
     ├── utils.py                   # Gestione percorsi risorse e icone
     └── window.py                  # Gestione configurazione finestre

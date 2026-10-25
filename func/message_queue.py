@@ -37,12 +37,12 @@ def _retry_worker():
             msg_obj = message_retry_queue.get()
 
             if msg_obj.attempts >= max_attempts:
-                log.error(f"{get("log.message_queue.discarded").format(max_attempts=max_attempts)}{get("log.message_queue.discarded_text").format(msg=msg_obj.notification_msg[:30])}")
+                log.error(f"{get('log.message_queue.discarded').format(max_attempts=max_attempts)}{get('log.message_queue.discarded_text').format(msg=msg_obj.notification_msg[:30])}")
                 message_retry_queue.task_done()
                 continue
 
             msg_obj.attempts += 1
-            log.info(f"{get("log.message_queue.attempts").format(attempts=msg_obj.attempts, max_attempts=max_attempts)}{get("log.message_queue.remaining").format(qsize=(message_retry_queue.qsize() + 1))}")
+            log.info(f"{get('log.message_queue.attempts').format(attempts=msg_obj.attempts, max_attempts=max_attempts)}{get('log.message_queue.remaining').format(qsize=(message_retry_queue.qsize() + 1))}")
 
             success = send_telegram(msg_obj.notification_msg, is_retry=True)
 
