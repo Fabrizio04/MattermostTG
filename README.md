@@ -5,7 +5,7 @@ Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed e
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![PyQt6](https://img.shields.io/badge/GUI-PyQt6-green.svg)
-![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS%20%7C%20docker-lightgrey.svg)
 ![Build](https://github.com/Fabrizio04/MattermostTG/actions/workflows/build.yml/badge.svg)
 
 ---
