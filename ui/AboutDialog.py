@@ -9,6 +9,7 @@ from func.i18n import get
 from func.window import initialize_window, exec_with_parent_dim
 
 from settings import config
+from version import __version__
 from ui.CustomTitleBar import CustomTitleBar
 
 class AboutDialog(QDialog):
@@ -45,7 +46,7 @@ class AboutDialog(QDialog):
         layout.addWidget(lbl_title)
 
         # Versione
-        lbl_version = QLabel(f"{get('about.version')} 1.1.0 (Cross-Platform)")
+        lbl_version = QLabel(f"{get('about.version')} {__version__} (Cross-Platform)")
         lbl_version.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(lbl_version)
 

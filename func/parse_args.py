@@ -2,8 +2,9 @@ import argparse
 import os
 import sys
 
-from func.get_system_locale import get_system_locale
 from func.i18n import get
+from version import __version__
+from func.get_system_locale import get_system_locale
 
 class WideHelpFormatter(argparse.RawTextHelpFormatter):
     def __init__(self, prog, indent_increment=2, max_help_position=43, width=None):
@@ -14,7 +15,7 @@ def parse_args():
         sys.argv[sys.argv.index("/?")] = "--help"
 
     parser = argparse.ArgumentParser(
-        description=get("args.description"),
+        description=f"{get('args.description')}\nv.{__version__}",
         formatter_class=WideHelpFormatter,
         epilog=""""""+get("args.env")+"""
   HEADLESS                        """+get("args.headless")+"""
@@ -46,13 +47,20 @@ def parse_args():
 
     for action in parser._actions:
         if isinstance(action, argparse._HelpAction):
-            action.help = ""
+            action.help = get("args.help")
+
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=__version__,
+        help=get("args.version")
+    )
 
     parser.add_argument(
         "--open-settings",
         action="store_true",
         default=False,
-        help=get("args.help")
+        help=get("args.open_settings")
     )
 
     parser.add_argument(

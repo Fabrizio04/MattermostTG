@@ -2,6 +2,7 @@ import os
 import sys
 import shutil
 import keyring
+import webbrowser
 from pathlib import Path
 import mattermost_listener
 
@@ -28,6 +29,7 @@ from func.aes import get_or_create_aes_key
 from func.check_on_close import check_on_close
 from func.create_toggle_row import create_toggle_row
 from func.get_system_locale import get_system_locale
+from func.check_for_updates import check_for_updates
 from func.window import initialize_window, get_overlay
 from func.check_auto_startup import check_auto_startup
 
@@ -162,6 +164,7 @@ class SettingsDialog(QDialog):
         self.menu_help = self.menu_bar.addMenu(get("settings.menubar.help.title"))
         
         self.act_updates = QAction(get("settings.menubar.help.update"), self)
+        self.act_updates.triggered.connect(self.check_update)
         self.menu_help.addAction(self.act_updates)
         
         self.act_about = QAction(get("settings.menubar.help.about"), self)
@@ -591,6 +594,21 @@ Terminal=false
         self.log_dialog.show()
         self.log_dialog.raise_()
         self.log_dialog.activateWindow()
+
+    def check_update(self):
+        has_update, latest_ver, url = check_for_updates()
+        
+        if has_update:
+            confirm = CustomMessageBox.ask_yes_no(
+                self,
+                get('update.title_confirm'),
+                get('update.message_confirm').format(latest_ver=latest_ver)
+            )
+            
+            if confirm == "yes" and url:
+                webbrowser.open(url)
+        else:
+            CustomMessageBox.show_info(self, get('update.title'), get('update.message').format(latest_ver=latest_ver))
 
     def open_about(self):
         AboutDialog.open_AboutDialog(self)

@@ -34,6 +34,7 @@ MattermostTG/
 ├── func/
     ├── aes.py                     # Gestione crittografia AES-256
     ├── check_auto_startup.py      # Funzione per verifica auto startup
+    ├── check_for_updates.py       # Funzione per verifica aggiornamenti
     ├── check_on_close.py          # Funzione per controllo modifiche
     ├── create_toggle_row.py       # Funzione per creazione toggle row
     ├── decrypter.py               # Funzione per formattazione decrypter

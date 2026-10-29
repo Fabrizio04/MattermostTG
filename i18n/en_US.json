@@ -215,6 +215,12 @@
         "logging_level": "Logging Level:",
         "clear_log": "Clear Log"
     },
+    "update": {
+        "title": "No updates",
+        "message": "You are already using latest version ({latest_ver})",
+        "title_confirm": "Update available",
+        "message_confirm": "A new version is available ({latest_ver})\nWould you like to open the download page?"
+    },
     "about": {
         "title": "About - Mattermost Notifier",
         "version": "Version",
@@ -296,12 +302,16 @@
         "http_server": {
             "start": "HTTP server started on port {port}",
             "stop": "HTTP server stopped"
+        },
+        "update": {
+            "check_error": "Unable to check for updates:"
         }
     },
     "args": {
         "description": "Mattermost Notifier - Cross-platform, headless notification utility.",
         "env": "Environment variables (ENV) supported as an alternative to arguments:",
         "help": "Show the guide.",
+        "version": "Show version.",
         "open_settings": "Launches the application in tray-icon mode and immediately opens the settings.",
         "headless": "Launch the application in headless mode (no GUI).",
         "port": "TCP port for the control/status HTTP server (default: 8080).",

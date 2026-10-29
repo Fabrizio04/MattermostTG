@@ -422,6 +422,42 @@ def test_settings_dialog_open_log(qtbot, monkeypatch):
         
         dlg.close()
 
+@patch("ui.SettingsDialog.check_for_updates")
+@patch("ui.SettingsDialog.CustomMessageBox")
+@patch("ui.SettingsDialog.webbrowser")
+def test_check_update_available_yes(mock_webbrowser, mock_msg_box, mock_check_updates, qapp):
+    mock_check_updates.return_value = (True, "1.2.0", "https://github.com/Fabrizio04/MattermostTG/releases/tag/v1.2.0")
+    mock_msg_box.ask_yes_no.return_value = "yes"
+    
+    dialog = SettingsDialog(qapp)
+    dialog.check_update()
+    
+    mock_msg_box.ask_yes_no.assert_called_once()
+    mock_webbrowser.open.assert_called_once_with("https://github.com/Fabrizio04/MattermostTG/releases/tag/v1.2.0")
+
+@patch("ui.SettingsDialog.check_for_updates")
+@patch("ui.SettingsDialog.CustomMessageBox")
+@patch("ui.SettingsDialog.webbrowser")
+def test_check_update_available_no(mock_webbrowser, mock_msg_box, mock_check_updates, qapp):
+    mock_check_updates.return_value = (True, "1.2.0", "https://github.com/Fabrizio04/MattermostTG/releases/tag/v1.2.0")
+    mock_msg_box.ask_yes_no.return_value = "no"
+    
+    dialog = SettingsDialog(qapp)
+    dialog.check_update()
+    
+    mock_msg_box.ask_yes_no.assert_called_once()
+    mock_webbrowser.open.assert_not_called()
+
+@patch("ui.SettingsDialog.check_for_updates")
+@patch("ui.SettingsDialog.CustomMessageBox")
+def test_check_update_not_available(mock_msg_box, mock_check_updates, qapp):
+    mock_check_updates.return_value = (False, "1.0.0", "")
+    
+    dialog = SettingsDialog(qapp)
+    dialog.check_update()
+    
+    mock_msg_box.show_info.assert_called_once()
+
 def test_settings_dialog_open_about(qtbot, monkeypatch):
     monkeypatch.setattr("ui.SettingsDialog.config", {
         "MATTERMOST_WS_URL": "", "MATTERMOST_TOKEN": "", "TELEGRAM_BOT_TOKEN": "", "TELEGRAM_CHAT_ID": "",
