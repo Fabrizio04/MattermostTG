@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   mattermost-notifier:
-    image: ghcr.io/fabrizio04/mattermosttg:main
+    image: ghcr.io/fabrizio04/mattermosttg
     container_name: mattermost-notifier
     restart: unless-stopped
     ports:

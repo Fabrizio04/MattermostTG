@@ -81,12 +81,20 @@ jobs:
     - name: Display structure of downloaded files
       run: ls -R
 
+    - name: Package artifacts into zip files
+      run: |
+        # Creiamo gli archivi zip per ogni cartella di artifact scaricata
+        cd MattermostNotifier-Windows && zip -r ../MattermostNotifier-Windows.zip * && cd ..
+        cd MattermostNotifier-Linux && zip -r ../MattermostNotifier-Linux.zip * && cd ..
+        cd MattermostNotifier-macOS && zip -r ../MattermostNotifier-macOS.zip * && cd ..
+        ls -la
+
     - name: Create Release and Upload Assets
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          MattermostNotifier-Windows/*
-          MattermostNotifier-Linux/*
-          MattermostNotifier-macOS/*
+          MattermostNotifier-Windows.zip
+          MattermostNotifier-Linux.zip
+          MattermostNotifier-macOS.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
