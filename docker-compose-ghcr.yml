@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mattermost-notifier:
+    image: ghcr.io/fabrizio04/mattermosttg:main
+    container_name: mattermost-notifier
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - HEADLESS=True
+      - LOG_LEVEL=INFO
+      - MATTERMOST_WS_URL=wss://mattermost.tuodominio.it/api/v4/websocket
+      - MATTERMOST_TOKEN=my_mattermost_token
+      - TELEGRAM_BOT_TOKEN=my_bot_token
+      - TELEGRAM_CHAT_ID=my_chat_id
+      - ECHO_SUPPRESSION_ENABLED=True
+      - INCLUDE_CHANNEL=True
+      - INCLUDE_SENDER=True
+      - INCLUDE_MESSAGE=True
+      - LANGUAGE=it_IT
+      - LANG=it_IT.UTF-8
+      - LC_ALL=it_IT.UTF-8
+      - TZ=Europe/Rome
+    volumes:
+      - ./data:/root/.mattermost_notifier

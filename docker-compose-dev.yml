@@ -14,6 +14,7 @@ services:
       - MATTERMOST_TOKEN=my_mattermost_token
       - TELEGRAM_BOT_TOKEN=my_bot_token
       - TELEGRAM_CHAT_ID=my_chat_id
+      - ECHO_SUPPRESSION_ENABLED=True
       - INCLUDE_CHANNEL=True
       - INCLUDE_SENDER=True
       - INCLUDE_MESSAGE=True
