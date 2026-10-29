@@ -68,10 +68,33 @@ jobs:
         name: MattermostNotifier-${{ runner.os }}
         path: dist/MattermostNotifier*
 
-    - name: Create Release
-      if: startsWith(github.ref, 'refs/tags/')
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+    - name: Download all workflow artifacts
+      uses: actions/download-artifact@v4
+
+    - name: Display structure of downloaded files
+      run: ls -R
+
+    - name: Package artifacts into zip files
+      run: |
+        # Creiamo gli archivi zip per ogni cartella di artifact scaricata
+        cd MattermostNotifier-Windows && zip -r ../MattermostNotifier-Windows.zip * && cd ..
+        cd MattermostNotifier-Linux && zip -r ../MattermostNotifier-Linux.zip * && cd ..
+        cd MattermostNotifier-macOS && zip -r ../MattermostNotifier-macOS.zip * && cd ..
+        ls -la
+
+    - name: Create Release and Upload Assets
       uses: softprops/action-gh-release@v2
       with:
-        files: dist/MattermostNotifier*
+        files: |
+          MattermostNotifier-Windows.zip
+          MattermostNotifier-Linux.zip
+          MattermostNotifier-macOS.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
