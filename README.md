@@ -83,7 +83,8 @@ MattermostTG/
 ├── mattermost_listener.py         # Gestione ciclo eventi WebSocket asyncio
 ├── mattermost_notifier.py         # Entry point dell'applicazione
 ├── MattermostApp.py               # Gestione System Tray e menu contestuale
-└── settings.py                    # Lettura/scrittura configurazioni e keyring
+├── settings.py                    # Lettura/scrittura configurazioni e keyring
+└── version.py                     # Versione app per gestione aggiornamenti
 ```
 
 ---
@@ -119,7 +120,7 @@ MattermostTG/
 
 5. **Installa le dipendenze Python:**
    ```bash
-   pip install PyQt6 websockets requests keyring cryptography pyinstaller
+   pip install PyQt6 websockets requests keyring cryptography emoji pyinstaller
    ```
 
 6. **Avvia l'applicazione:**

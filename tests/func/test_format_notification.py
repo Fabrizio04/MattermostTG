@@ -25,6 +25,7 @@ def test_format_notification_standard(monkeypatch):
     res = format_notification(1600000000000, "general", "Mario", "Ciao a tutti")
     
     assert "Mattermost Notifier" in res
+    assert "Data:* 2020-09-13" in res
     assert "Canale:* general" in res
     assert "Mittente:* Mario" in res
     assert "Messaggio:*\nCiao a tutti" in res
@@ -46,7 +47,8 @@ def test_format_notification_anonymous_mode(monkeypatch):
     monkeypatch.setattr("func.format_notification.get", mock_get)
     
     res = format_notification(1600000000000, "general", "Mario", "Segreto")
-    
+
+    assert "Data:* 2020-09-13" in res
     assert "Messaggio privato standard" in res
     assert "general" not in res
     assert "Mario" not in res
@@ -72,3 +74,26 @@ def test_format_notification_with_aes_encryption(mock_aes, monkeypatch):
     
     mock_aes.assert_called_once()
     assert res == "CIPHERTEXT_ABC123"
+
+def test_format_notification_with_emojis(monkeypatch):
+    monkeypatch.setattr("func.format_notification.config", {
+        "ANONYMOUS_MODE": False,
+        "INCLUDE_CHANNEL": False,
+        "INCLUDE_SENDER": False,
+        "INCLUDE_MESSAGE": True,
+        "AES_ENCRYPTION_ENABLED": False
+    })
+
+    def mock_get(key_path, default=None):
+        mapping = {
+            "main.date_format": "%Y-%m-%d",
+            "main.date": "Data",
+            "main.message": "Messaggio"
+        }
+        return mapping.get(key_path, key_path)
+
+    monkeypatch.setattr("func.format_notification.get", mock_get)
+    res = format_notification(1600000000000, "general", "Mario", "Ciao :smile: e :test:")
+
+    assert "😄" in res
+    assert "[[test]]" in res

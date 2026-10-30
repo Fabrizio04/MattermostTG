@@ -33,7 +33,7 @@ jobs:
     - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install PyQt6 pytest pytest-qt websockets requests keyring keyrings.alt cryptography pyinstaller
+        pip install PyQt6 pytest pytest-qt websockets requests keyring keyrings.alt cryptography emoji pyinstaller
 
     - name: Run Tests (Linux)
       if: runner.os == 'Linux'
