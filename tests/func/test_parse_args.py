@@ -7,6 +7,7 @@ def test_parse_args_defaults(monkeypatch):
     monkeypatch.setattr(sys, "argv", ["script.py"])
     monkeypatch.delenv("PORT", raising=False)
     monkeypatch.delenv("HEADLESS", raising=False)
+    monkeypatch.delenv("LANGUAGE", raising=False)
     
     with patch("func.parse_args.get", side_effect=lambda key, default=None: key), \
          patch("func.parse_args.get_system_locale", return_value="en_US"):

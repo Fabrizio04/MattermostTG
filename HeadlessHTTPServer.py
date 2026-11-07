@@ -15,6 +15,9 @@ from func.openapi import get_openapi_spec
 
 httpd = None
 
+class ReusableTCPServer(socketserver.TCPServer):
+    allow_reuse_address = True
+
 class HeadlessHTTPServer(http.server.BaseHTTPRequestHandler):
     
     def _check_auth(self):
@@ -189,7 +192,7 @@ class HeadlessHTTPServer(http.server.BaseHTTPRequestHandler):
         global httpd
         port = config.get("PORT", 8080)
         server_address = ("", port)
-        httpd = socketserver.TCPServer(server_address, HeadlessHTTPServer)
+        httpd = ReusableTCPServer(server_address, HeadlessHTTPServer)
         log.info(get("log.http_server.start").format(port=port))
         httpd.serve_forever()
 

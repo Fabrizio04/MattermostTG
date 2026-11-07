@@ -130,6 +130,34 @@ MattermostTG/
 
 ---
 
+## 🧪 Test
+
+1. **Installa le dipendenze Python:**
+   ```bash
+   pip install pytest pytest-qt
+   ```
+
+   NOTA: per i sistemi operativi headless (es. server CI/CD), installare anche keyrings.alt
+
+2. **Lanciare i test**
+
+   **Windows**
+   ```bash
+   python -m pytest
+   ```
+   **Linux / macOS**
+   ```bash
+   pytest
+   ```
+
+   NOTA: Per i sistemi operativi headless (es. server CI/CD), impostare la variabile d'ambiente prima di lanciare i test:
+   ```bash
+   export QT_QPA_PLATFORM=offscreen
+   pytest
+   ```
+   
+---
+
 ## 📦 Generazione dell'Eseguibile Standalone
 
 ### 🪟 Windows (.exe)
@@ -152,7 +180,8 @@ Per una guida dettagliata all'installazione permanente e all'integrazione nel me
 pyinstaller --noconsole --onefile --add-data "img:img" --add-data "web:web" --add-data "i18n:i18n" --name "MattermostNotifier-macOS" mattermost_notifier.py
 ```
 
-Troverai il file eseguibile compilato all'interno della cartella `dist/`.
+Troverai il file eseguibile compilato all'interno della cartella `dist/`
+NOTA (Windows): Se si desidera visualizzare i log/output di console, rimuovere il flag `--noconsole`
 
 ---
 
@@ -172,6 +201,22 @@ Alla prima esecuzione:
    * **Telegram Bot Token** (ottenuto da [@BotFather](https://telegram.me/BotFather))
    * **Telegram Chat ID** (ottenuto da [@userinfobot](https://telegram.me/userinfobot))
 3. Clicca su **Salva**. L'app si connetterà immediatamente!
+
+---
+
+## 🖼️ Screenshot
+
+| Windows 11 | Windows 11 (Dark Theme) |
+| :---------: | :---------: |
+| ![Windows11](./assets/windows.png) | ![Windows11_Dark](./assets/windows_dark.png) |
+
+| Linux Mint | Linux Mint (Dark Theme) |
+| :---------: | :---------: |
+| ![Mint](./assets/mint.png) | ![Mint_Dark](./assets/mint_dark.png) |
+
+| Ubuntu | MX Linux |
+| :---------: | :---------: |
+| ![Ubuntu](./assets/ubuntu.png) | ![MXLinux](./assets/mxlinux.png) |
 
 ---
 
