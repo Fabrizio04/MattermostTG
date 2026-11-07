@@ -1,6 +1,6 @@
 # 🔔 Mattermost to Telegram Notifier
 
-Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed elegante creata in Python e PyQt6 per inoltrare le notifiche da **Mattermost** direttamente a un bot **Telegram** personalizzato.
+Un'applicazione cross-platform (Windows, Linux, macOS) e multilingua, leggera e sicura, creata in Python/PyQt6 per inoltrare le notifiche da **Mattermost** a **Telegram** tramite interfaccia grafica (system tray) o modalità headless/container.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
@@ -14,16 +14,17 @@ Un'applicazione tray cross-platform (Windows, Linux, macOS) leggera, sicura ed e
 
 ## 🌟 Caratteristiche Principali
 
-* **Cross-Platform System Tray App**: Funziona in background su Windows, Linux (GNOME, Cinnamon, XFCE) e macOS con un'icona di stato dinamica (Attiva / Inattiva).
-* **Connessione WebSocket**: Ascolto in tempo reale degli eventi Mattermost senza carico sul server.
-* **Sicurezza Avanzata**:
+* **Cross-Platform & Dual Mode:** Funziona come app di sistema in background (`System Tray`) su Windows, Linux (GNOME, Cinnamon, XFCE) e macOS con un'icona di stato dinamica (Attiva / Inattiva), oppure in modalità `headless` / `containerizzata` per server e ambienti senza interfaccia grafica.
+* **Supporto Multi-Lingua:** Interfaccia e messaggi localizzati (italiano e inglese già inclusi) con rilevamento automatico della lingua di sistema o forzatura tramite parametri.
+* **Connessione WebSocket:** Ascolto in tempo reale degli eventi Mattermost senza carico sul server.
+* **Sicurezza Avanzata:**
   * I token sensibili (Mattermost e Telegram) sono salvati in modo sicuro nel gestore credenziali di sistema (**Windows Credential Manager**, **Secret Service/KWallet**, **macOS Keychain**) tramite `keyring` con fallback graceful.
   * È possibile inoltrare i messaggi usando lo standard di crittografia `AES-256`
   * Le impostazioni generali non sensibili sono salvate in locale su `mattermosttg.json`.
-* **Compatibilità Linux/GNOME**: Gestione automatica del backend grafico (`xcb`/`wayland`) e isolamento da bug di temi GTK3/GLib per evitare crash di sistema.
-* **Riconnessione al volo**: Modificando l'URL o il token nelle impostazioni, il WebSocket viene ricreato automaticamente senza dover riavviare l'applicazione.
-* **Notifiche Formattate**: Ricevi la data e l'ora del messaggio, il nome del mittente e il canale direttamente su Telegram.
-* **Logging personalizzato**: Tracciamento di eventi ed errori su console e file locale `mattermosttg.log`.
+* **Compatibilità Linux/GNOME:** Gestione automatica del backend grafico (`xcb` / `wayland`) e isolamento da bug di temi GTK3/GLib per evitare crash di sistema.
+* **Riconnessione al volo:** Modificando l'URL o il token nelle impostazioni, il WebSocket viene ricreato automaticamente senza dover riavviare l'applicazione.
+* **Notifiche Formattate:** Ricevi la data e l'ora del messaggio, il nome del mittente e il canale direttamente su Telegram.
+* **Logging personalizzato:** Tracciamento di eventi ed errori su console e file locale `mattermosttg.log`.
 
 ---
 
@@ -137,7 +138,7 @@ MattermostTG/
    pip install pytest pytest-qt
    ```
 
-   NOTA: per i sistemi operativi headless (es. server CI/CD), installare anche keyrings.alt
+   NOTA: per i sistemi operativi headless (es. server CI/CD), installare anche `keyrings.alt`
 
 2. **Lanciare i test**
 
@@ -181,6 +182,7 @@ pyinstaller --noconsole --onefile --add-data "img:img" --add-data "web:web" --ad
 ```
 
 Troverai il file eseguibile compilato all'interno della cartella `dist/`
+
 NOTA (Windows): Se si desidera visualizzare i log/output di console, rimuovere il flag `--noconsole`
 
 ---
