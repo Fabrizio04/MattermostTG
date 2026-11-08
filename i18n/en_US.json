@@ -252,6 +252,7 @@
         },
         "settings": {
             "error_load": "Error loading json:",
+            "error_sensitive_data": "Error while handling sensitive data during import:",
             "error_keyring": "Error loading keyring (system or backend not supported):",
             "saved": "Settings saved successfully.",
             "error_save_settings": "Error saving json:",

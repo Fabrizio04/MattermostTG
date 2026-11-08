@@ -382,11 +382,14 @@ class SettingsDialog(QDialog):
             try:
                 shutil.copy(file_path, CONFIG_FILE_PATH)
 
-                from settings import load_settings
+                from settings import load_settings, handle_imported_sensitive_data
+                handle_imported_sensitive_data()
                 load_settings()
 
                 self.txt_ws_url.setText(config.get("MATTERMOST_WS_URL", ""))
+                self.txt_mm_token.setText(config.get("MATTERMOST_TOKEN", ""))
                 self.txt_tg_chat_id.setText(config.get("TELEGRAM_CHAT_ID", ""))
+                self.txt_tg_token.setText(config.get("TELEGRAM_BOT_TOKEN", ""))
                 self.toggle_aes.setChecked(config.get("AES_ENCRYPTION_ENABLED", False))
                 self.chk_echo.setChecked(get("ECHO_SUPPRESSION_ENABLED", True))
                 self.toggle_anon.setChecked(get("ANONYMOUS_MODE", False))

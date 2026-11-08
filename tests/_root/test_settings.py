@@ -92,6 +92,36 @@ def test_save_settings(tmp_path):
         assert saved_data["THEME"] == "dark"
         assert mock_set_key.call_count == 2
 
+def test_handle_imported_sensitive_data(tmp_path):
+    config_file = tmp_path / "config.json"
+    initial_data = {
+        "MATTERMOST_WS_URL": "wss://test.com",
+        "MATTERMOST_TOKEN": "secret_mm_token_123",
+        "TELEGRAM_BOT_TOKEN": "secret_tg_token_456",
+        "AES_ENCRYPTION_KEY": "secret_aes_key_789",
+        "THEME": "light"
+    }
+    config_file.write_text(json.dumps(initial_data), encoding="utf-8")
+
+    with patch("settings.CONFIG_FILE_PATH", str(config_file)), \
+         patch("settings.keyring.set_password") as mock_set_password:
+        
+        settings.handle_imported_sensitive_data()
+
+        assert mock_set_password.call_count == 3
+        mock_set_password.assert_any_call("MattermostNotifier", "MATTERMOST_TOKEN", "secret_mm_token_123")
+        mock_set_password.assert_any_call("MattermostNotifier", "TELEGRAM_BOT_TOKEN", "secret_tg_token_456")
+        mock_set_password.assert_any_call("MattermostNotifier", "AES_ENCRYPTION_KEY", "secret_aes_key_789")
+
+    with open(config_file, "r", encoding="utf-8") as f:
+        updated_data = json.load(f)
+
+    assert "MATTERMOST_TOKEN" not in updated_data
+    assert "TELEGRAM_BOT_TOKEN" not in updated_data
+    assert "AES_ENCRYPTION_KEY" not in updated_data
+    assert updated_data["MATTERMOST_WS_URL"] == "wss://test.com"
+    assert updated_data["THEME"] == "light"
+
 def test_reset_settings():
     with patch("settings.get_system_locale", return_value="it"):
         settings.reset_settings()

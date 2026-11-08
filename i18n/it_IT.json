@@ -252,6 +252,7 @@
         },
         "settings": {
             "error_load": "Errore caricamento json:",
+            "error_sensitive_data": "Errore durante la gestione dei dati sensibili in import:",
             "error_keyring": "Errore caricamento keyring (sistema o backend non supportato):",
             "saved": "Impostazioni salvate con successo.",
             "error_save_settings": "Errore salvataggio json:",

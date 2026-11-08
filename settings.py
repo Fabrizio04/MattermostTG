@@ -97,6 +97,30 @@ def load_settings(args = None):
             config["MATTERMOST_TOKEN"] = config.get("MATTERMOST_TOKEN", "")
             config["TELEGRAM_BOT_TOKEN"] = config.get("TELEGRAM_BOT_TOKEN", "")
 
+def handle_imported_sensitive_data():
+    """Verifica la presenza di chiavi sensibili nel JSON importato,
+    le sposta nel keyring di sistema e le rimuove dal file."""
+    try:
+        with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        updated = False
+
+        sensitive_keys = ["MATTERMOST_TOKEN", "TELEGRAM_BOT_TOKEN","AES_ENCRYPTION_KEY"]
+        
+        for json_key in sensitive_keys:
+            if json_key in data and data[json_key]:
+                keyring.set_password(APP_NAME, json_key, data[json_key])
+                del data[json_key]
+                updated = True
+                
+        if updated:
+            with open(CONFIG_FILE_PATH, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4)
+    except Exception as e:
+        from func.i18n import get
+        log.error(f"{get('log.settings.error_sensitive_data')} {e}")
+
 def reset_settings():
     global config
     config["MATTERMOST_WS_URL"] = ""

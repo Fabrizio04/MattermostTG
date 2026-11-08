@@ -134,6 +134,7 @@ def test_settings_dialog_import_settings_json(qtbot, monkeypatch, tmp_path):
     with patch("ui.SettingsDialog.check_on_close", return_value=True), \
          patch("ui.SettingsDialog.CONFIG_FILE_PATH", str(config_target)), \
          patch("ui.SettingsDialog.QFileDialog.getOpenFileName", return_value=(str(import_source), "JSON Files (*.json)")), \
+         patch("settings.handle_imported_sensitive_data") as mock_handle_imported_sensitive_data, \
          patch("settings.load_settings") as mock_load_settings, \
          patch("mattermost_listener.reconnect_websocket") as mock_reconnect, \
          patch("ui.SettingsDialog.CustomMessageBox.show_info") as mock_info, \
@@ -149,6 +150,7 @@ def test_settings_dialog_import_settings_json(qtbot, monkeypatch, tmp_path):
             print("CRITICAL CALLED WITH:", mock_crit.call_args)
         
         assert config_target.exists()
+        mock_handle_imported_sensitive_data.assert_called_once()
         mock_load_settings.assert_called_once()
         mock_reconnect.assert_called_once()
         mock_info.assert_called_once()
