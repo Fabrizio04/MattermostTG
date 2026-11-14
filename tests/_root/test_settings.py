@@ -1,4 +1,5 @@
 import json
+import pytest
 import settings
 
 from unittest.mock import patch, MagicMock
@@ -121,6 +122,42 @@ def test_handle_imported_sensitive_data(tmp_path):
     assert "AES_ENCRYPTION_KEY" not in updated_data
     assert updated_data["MATTERMOST_WS_URL"] == "wss://test.com"
     assert updated_data["THEME"] == "light"
+
+def test_validate_config_valid_cases():
+    valid_configs = [
+        {},
+        {"THEME": "light", "LOG_LEVEL": "DEBUG"},
+        {"MATTERMOST_WS_URL": "wss://test.mattermost.com", "WS_RECONNECT_TIMEOUT": 10},
+        {"TELEGRAM_CHAT_ID": 12345678, "ANONYMOUS_MODE": True, "LANGUAGE": "it_IT"},
+        {"MATTERMOST_TOKEN": "secret_token_123"}
+    ]
+    for cfg in valid_configs:
+        assert settings.validate_config(cfg) is True
+
+def test_validate_config_non_dict_input():
+    assert settings.validate_config(None) is False
+    assert settings.validate_config("not_a_dict") is False
+    assert settings.validate_config([1, 2, 3]) is False
+
+def test_validate_config_unknown_keys():
+    assert settings.validate_config({"CHIAVE_SCONOSCIUTA": "valore"}) is False
+
+@pytest.mark.parametrize("key,value", [
+    ("MATTERMOST_WS_URL", "http://not-a-websocket.com"),  # URL non ws:// o wss://
+    ("WS_RECONNECT_TIMEOUT", "10"),                       # Stringa anziché intero
+    ("RETRY_LOGIC_TIMEOUT", 15.5),                        # Float anziché intero
+    ("ECHO_SUPPRESSION_ENABLED", "True"),                 # Stringa anziché booleano
+    ("LOG_LEVEL", "SUPER_DEBUG"),                         # Log level inesistente
+    ("THEME", "neon"),                                    # Tema inesistente
+    ("LANGUAGE", "en-US"),                                # Formato BCP 47 errato (deve essere underscore it_IT)
+    ("LANGUAGE", "italiano"),                             # Formato errato
+    ("LANGUAGE", 123),                                    # Tipo errato per la lingua
+    ("TELEGRAM_CHAT_ID", [12345]),                        # Lista non ammessa per il chat ID
+    ("EXCLUDED_SENDERS", 999),                            # Intero anziché stringa
+])
+def test_validate_config_invalid_values(key, value):
+    config_to_test = {key: value}
+    assert settings.validate_config(config_to_test) is False
 
 def test_reset_settings():
     with patch("settings.get_system_locale", return_value="it"):

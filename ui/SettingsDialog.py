@@ -380,9 +380,17 @@ class SettingsDialog(QDialog):
         file_path, _ = QFileDialog.getOpenFileName(self, get("settings.import.caption"), "", "JSON Files (*.json)")
         if file_path:
             try:
-                shutil.copy(file_path, CONFIG_FILE_PATH)
+                import json
+                from settings import validate_config, load_settings, handle_imported_sensitive_data
 
-                from settings import load_settings, handle_imported_sensitive_data
+                with open(file_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+
+                if not validate_config(data):
+                    raise Exception(get("settings.import.validate_config_err"))
+                
+                shutil.copy(file_path, CONFIG_FILE_PATH)           
+
                 handle_imported_sensitive_data()
                 load_settings()
 
@@ -391,12 +399,11 @@ class SettingsDialog(QDialog):
                 self.txt_tg_chat_id.setText(config.get("TELEGRAM_CHAT_ID", ""))
                 self.txt_tg_token.setText(config.get("TELEGRAM_BOT_TOKEN", ""))
                 self.toggle_aes.setChecked(config.get("AES_ENCRYPTION_ENABLED", False))
-                self.chk_echo.setChecked(get("ECHO_SUPPRESSION_ENABLED", True))
-                self.toggle_anon.setChecked(get("ANONYMOUS_MODE", False))
-
-                self.toggle_channel.setChecked(get("INCLUDE_CHANNEL", True))
-                self.toggle_sender.setChecked(get("INCLUDE_SENDER", True)) 
-                self.toggle_message.setChecked(get("INCLUDE_MESSAGE", True))
+                self.chk_echo.setChecked(config.get("ECHO_SUPPRESSION_ENABLED", True))
+                self.toggle_anon.setChecked(config.get("ANONYMOUS_MODE", False))
+                self.toggle_channel.setChecked(config.get("INCLUDE_CHANNEL", True))
+                self.toggle_sender.setChecked(config.get("INCLUDE_SENDER", True)) 
+                self.toggle_message.setChecked(config.get("INCLUDE_MESSAGE", True))
 
                 mattermost_listener.reconnect_websocket()
 

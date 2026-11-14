@@ -135,6 +135,7 @@ def test_settings_dialog_import_settings_json(qtbot, monkeypatch, tmp_path):
          patch("ui.SettingsDialog.CONFIG_FILE_PATH", str(config_target)), \
          patch("ui.SettingsDialog.QFileDialog.getOpenFileName", return_value=(str(import_source), "JSON Files (*.json)")), \
          patch("settings.handle_imported_sensitive_data") as mock_handle_imported_sensitive_data, \
+         patch("settings.validate_config") as mock_validate_config, \
          patch("settings.load_settings") as mock_load_settings, \
          patch("mattermost_listener.reconnect_websocket") as mock_reconnect, \
          patch("ui.SettingsDialog.CustomMessageBox.show_info") as mock_info, \
@@ -151,10 +152,32 @@ def test_settings_dialog_import_settings_json(qtbot, monkeypatch, tmp_path):
         
         assert config_target.exists()
         mock_handle_imported_sensitive_data.assert_called_once()
+        mock_validate_config.assert_called_once()
         mock_load_settings.assert_called_once()
         mock_reconnect.assert_called_once()
         mock_info.assert_called_once()
         mock_crit.assert_not_called()
+        
+        dlg.close()
+
+def test_settings_dialog_import_settings_json_invalid(qtbot, monkeypatch, tmp_path):
+    import_source = tmp_path / "import_config_invalid.json"
+    import_source.write_text('{"CHIAVE_FALSA": "valore_errato"}', encoding="utf-8")
+
+    config_target = tmp_path / "sub" / "config.json"
+    config_target.parent.mkdir(parents=True, exist_ok=True)
+
+    with patch("ui.SettingsDialog.CONFIG_FILE_PATH", str(config_target)), \
+         patch("ui.SettingsDialog.QFileDialog.getOpenFileName", return_value=(str(import_source), "JSON Files (*.json)")), \
+         patch("ui.SettingsDialog.CustomMessageBox.show_critical") as mock_crit, \
+         patch("ui.SettingsDialog.check_auto_startup", return_value=False), \
+         patch("ui.SettingsDialog.check_on_close", return_value=True):
+        
+        dlg = SettingsDialog()
+        dlg.import_settings_json()
+
+        mock_crit.assert_called_once()
+        assert not config_target.exists()
         
         dlg.close()
 

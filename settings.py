@@ -1,4 +1,6 @@
 import os
+import re
+import sys
 import json
 import keyring
 
@@ -38,6 +40,13 @@ config = {
     "THEME": "light",
     "LANGUAGE": get_system_locale()
 }
+
+VALID_THEMES = {"light", "dark"}
+URL_REGEX = re.compile(r"^wss?://[^\s/$.?#].[^\s]*$")
+LANG_REGEX = re.compile(r"^[a-z]{2}_[A-Z]{2}$")
+VALID_LOG_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR"}
+SENSITIVE_KEYS = ["MATTERMOST_TOKEN", "TELEGRAM_BOT_TOKEN","AES_ENCRYPTION_KEY"]
+HEADLESS_KEYS = ["PORT","HTTP_USER","HTTP_PASS"]
 
 def _load(file_path):
     global config
@@ -104,11 +113,9 @@ def handle_imported_sensitive_data():
         with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
         
-        updated = False
-
-        sensitive_keys = ["MATTERMOST_TOKEN", "TELEGRAM_BOT_TOKEN","AES_ENCRYPTION_KEY"]
+        updated = False        
         
-        for json_key in sensitive_keys:
+        for json_key in SENSITIVE_KEYS:
             if json_key in data and data[json_key]:
                 keyring.set_password(APP_NAME, json_key, data[json_key])
                 del data[json_key]
@@ -120,6 +127,84 @@ def handle_imported_sensitive_data():
     except Exception as e:
         from func.i18n import get
         log.error(f"{get('log.settings.error_sensitive_data')} {e}")
+
+def validate_config(config_data: dict) -> bool:
+    """Valida la struttura e i valori di un dizionario di configurazione.
+    Restituisce True se tutto è valido altrimenti False.
+    """
+
+    # Verifica dict
+    if not isinstance(config_data, dict):
+        return False
+
+    # Struttura json
+    allowed_keys = set(config.keys()).union(set(SENSITIVE_KEYS + HEADLESS_KEYS))
+    
+    if not set(config_data.keys()).issubset(allowed_keys):
+        return False
+
+    try:
+        # Stringhe
+        str_keys = ["MATTERMOST_WS_URL", "EXCLUDED_SENDERS", "EXCLUDED_CHANNELS"] + SENSITIVE_KEYS
+        for s_key in str_keys:
+            val = config_data.get(s_key)
+            if val is not None and not isinstance(val, str):
+                return False
+
+        # URL WebSocket (può essere vuoto o un URL ws:// / wss:// valido)
+        ws_url = config_data.get("MATTERMOST_WS_URL", "")
+        if ws_url and not URL_REGEX.match(ws_url):
+            return False
+
+        # Telegram Chat ID (stringhe/interi)
+        if "TELEGRAM_CHAT_ID" in config_data:
+            val = config_data.get("TELEGRAM_CHAT_ID")
+            if val is not None and not isinstance(val, (str, int)):
+                return False
+
+        # Timeout e tentativi (interi positivi)
+        for int_key in ["WS_RECONNECT_TIMEOUT", "RETRY_LOGIC_TIMEOUT", "RETRY_LOGIC_MAX_ATTEMPTS", "TG_HTTP_TIMEOUT"]:
+            val = config_data.get(int_key)
+            if val is not None and not isinstance(val, int):
+                return False
+
+        # Flag booleani
+        bool_keys = [
+            "ECHO_SUPPRESSION_ENABLED", "ANONYMOUS_MODE", "INCLUDE_SENDER",
+            "INCLUDE_CHANNEL", "INCLUDE_MESSAGE", "AES_ENCRYPTION_ENABLED", "ALWAYS_ON_TOP"
+        ]
+        for b_key in bool_keys:
+            val = config_data.get(b_key)
+            if val is not None and not isinstance(val, bool):
+                return False
+
+        # Log Level
+        log_level = config_data.get("LOG_LEVEL")
+        if log_level is not None and log_level not in VALID_LOG_LEVELS:
+            return False
+
+        # Tema
+        theme = config_data.get("THEME")
+        if theme is not None and theme not in VALID_THEMES:
+            return False
+
+        # Lingua (Controllo formato esatto es. it_IT)
+        language = config_data.get("LANGUAGE")
+        if language is not None and (not isinstance(language, str) or not LANG_REGEX.match(language)):
+            return False
+
+        # Ccontrollo srv headless
+        for h_key in HEADLESS_KEYS:
+            val = config_data.get(h_key)
+            if val is not None and not isinstance(val, (str, int)):
+                return False
+
+    except Exception as e:
+        from func.i18n import get
+        log.error(f"{get('log.settings.error_validate_config')} {e}")
+        return False
+
+    return True
 
 def reset_settings():
     global config
